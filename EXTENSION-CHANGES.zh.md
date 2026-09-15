@@ -11,7 +11,6 @@
 - 新增 `apps/extension/`：Manifest V3 扩展，点工具栏图标即在侧边栏打开 dsh Web GUI；
 - 通过 native-messaging host 按需拉起本地 `dsh web` 服务器（`dsh install-browser-host --extension <id>` 一次注册，源码模式与构建产物模式均支持）；
 - 内嵌应用的 iframe 显式委派 `microphone` 与 `clipboard-write` 两项权限——跨源 iframe 默认两项都没有，缺后者会让消息的复制按钮静默失效；
-- 提交：`051b610f`、`894bbee2`、`90ce867b`、`c6e053d3`。
 
 ### 2. 页面上下文与正文读取
 
@@ -20,13 +19,11 @@
 - **正文里的图片**转成绝对 URL 的 Markdown 图片链接（模型拿到的是地址和 alt，不是像素）；模型支持图片输入时，再用 `read_image` 去读具体那张图；
 - **站点适配器**：数字根本不进 DOM 的页面（行情、K 线）走配置化适配器——`match` 匹主机名 → `capture` 从 URL/DOM 取参数 → `request` 拉公开接口 → `extract` 挑字段，结果作为 `<site_data>` 一并发出。**引擎不内置任何站点知识**，适配器是你自己的 `apps/extension/site-adapters.json`（已 gitignore，仓库里只有 `site-adapters.example.json` 示例）；
 - **页内流嗅探**：只对在适配器里声明了 `sniff` 的站点，在 `document_start` 往 MAIN world 注入一个 `window.WebSocket` 包装，解码站点自己的帧、按时间合并序列后挂到页面上供抽取——**只读不改**，不发任何帧、不动业务逻辑，这是读 TradingView 这类"数据只走 WebSocket"图表的唯一办法；
-- 提交：`4e1e15a3`、`d4899824`、`848d2993`、`275c692a`、`76c4c068`。
 
 ### 3. 语音输入（Voice Input）
 
 - 输入框工具栏新增麦克风按钮，基于 Web Speech API 听写，转写文字经草稿状态机追加（撤销/命令 token/发送行为与手打一致）；
 - 侧边栏内识别运行在扩展顶级页面并桥接回应用（绕过 Chrome 对跨源 iframe 的 Web Speech 限制），配套一次性的扩展麦克风授权页；
-- 提交：`0b81b3cf`、`44f340a5`、`90ce867b`。
 
 ### 4. AI 团队：本机专家 + 远程队友
 
@@ -34,7 +31,7 @@
 
 **本机专家（进程内，无需任何服务）**——主 agent 一句话直接拉起本机 CLI 干活、拿回结果：
 
-- 新增 `codex` / `claude_code` 两个委派工具（`dsh-base` 组合了上游自带的 `subagent-codex` / `subagent-claude-code` provider），在会话工作区内起官方 CLI，一次性任务返回最终答案；
+- `dsh-base` 挂载上游的 `subagent-codex` / `subagent-claude-code` provider，并在出厂 agent 预设中启用 `subagent_codex` / `subagent_claude_code` 两个委派工具，在会话工作区内起官方 CLI，一次性任务返回最终答案；
 - 说「让 codex 看看这段代码」即可，不经过任何 hub 或 daemon。
 
 **HXA 团队（跨机器，持久在线）**——新增 `packages/hxa/` 能力家族，接入自托管的 [HXA Connect](https://github.com/hypergraphdev/hxa-connect) hub：
@@ -44,13 +41,11 @@
 - `dsh-hxa-inbound`：**入站桥**——一条 WebSocket 让本机 bot 常驻在线（presence 与 coordinator 相互独立，互不拖累），队友来消息实时唤醒一个带 `hxa:coordinator` 人设的协调 agent，由它用自己的 `hxa_send` 应答；消息经 `followup` 落成持久 `user/message`，满足「模型可见 ⟺ 已记录」；
 - 桥接创建的 agent 显式取用部署默认模型（人设里的 `{{model}}` 变量读的是 agent 自己的 options，不给就在调模型前拼提示词失败）；固定的 session id 采用 resume-or-create——持久层拒绝在已有日志上重建，只 create 会让重启后每一轮都撞 id；
 - `scripts/connect-teammate.sh <teammate>`：一条命令把本机 CLI 挂成 org 里的在线队友（读环境或 `.env` 的 `HXA_HUB_URL` / `HXA_<NAME>_TOKEN`，零硬编码路径，daemon 包可用 `SLOCK_DAEMON_PACKAGE` 覆盖为本地 checkout）；
-- 提交：`930b5bc6`、`ae1ee795`、`b9ad8615`、`cb959a02`、`95fe159f`、`c6e053d3`、`d987d77d`。
 
 ### 5. 侧边栏 Agents 面板
 
 - 侧栏新增 `sidebar.agents` 座位与 `dsh-client-ui-agents` 插件：只读团队花名册，每行一个队友（在线绿点 + 角色），20 秒轮询刷新；
 - 数据经宿主新增的同源 `GET /api/hxa/contacts` 路由（精确路由，拒绝跨站请求）取自 `ctx.hxa`；HXA 休眠时路由返回 404、面板整个不渲染，未配置的部署一个像素都不占；
-- 提交：`668eb169`。
 
 ### 6. 微信接入（扫码即用）
 
@@ -61,13 +56,11 @@
 - 该轮跑着的时候在聊天里显示「对方正在输入」，让等待有反馈；指示器的任何失败都被吞掉——少个小点不值得赔上一条回复；
 - 设置页新增「微信」分区：未关联时显示二维码，关联后只显示账号与解除关联按钮；**二维码在面板内本地编码**（送给第三方图片服务等于把登录凭证交出去）；
 - 默认休眠：没有存储凭证时，服务不建连接、分区显示未关联；
-- 提交：`c6ef2c8c`、`c6e053d3`、`d987d77d`。
 
 ### 7. 界面打磨
 
 - 设置页左侧导航补上文字标签，图标按分区区分（消息类分区用会话图标，为将来接入微信之外的平台留位）；
 - 消息的复制按钮在侧边栏里恢复可用（见第 1 节的 iframe 权限委派）；
-- 提交：`c6e053d3`。
 
 ## 快速开始
 
@@ -80,6 +73,10 @@ pnpm dsh install-browser-host --extension <你的扩展id>
 
 2. `chrome://extensions` 开启开发者模式，"加载已解压的扩展程序"选择 `apps/extension/`，记下扩展 id 后重跑上一步；
 3. 点工具栏图标打开侧边栏即用。
+
+### 读图（无需配置）
+
+选择支持图片输入的模型，例如 `deepseek-flash`（DeepSeek-V41-Flash）；上传的图片和经 `read_image` 读取的图片会直接交给它。
 
 ### 配置站点适配器（可选，站点结构化数据需要）
 

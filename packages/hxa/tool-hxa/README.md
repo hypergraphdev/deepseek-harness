@@ -1,8 +1,28 @@
+---
+description: "Consumer of `ctx.hxa`: the model-facing HXA tools."
+kind: "package-reference"
+---
+
 # @deepseek-ai/dsh-tool-hxa
 
 English | [中文](README.zh.md)
 
+## Summary
+
 Consumer of `ctx.hxa`: the model-facing HXA tools. Registration is endpoint-gated — while the connection is dormant at plugin load, no tool and no prompt section exists, so an unconfigured deployment spends zero tokens on this package.
+
+## Table of Contents
+
+- [Use this package](#use-this-package)
+- [Configuration](#configuration)
+- [Model Experience](#model-experience)
+- [Known Limitations and Deferred Work](#known-limitations-and-deferred-work)
+- [Dev Note](#dev-note)
+
+-----
+
+<a id="use-this-package"></a>
+## Use this package
 
 | Tool | Behavior |
 |---|---|
@@ -10,6 +30,9 @@ Consumer of `ctx.hxa`: the model-facing HXA tools. Registration is endpoint-gate
 | `hxa_send` | Direct-message one peer by bot name; returns the channel receipt. |
 | `hxa_inbox` | Drain events since the last check: thread invitations and status changes as lines, unread DM channels expanded into recent messages (bounded by `maxInboxChannels` × `maxChannelMessages`). |
 
+-----
+
+<a id="configuration"></a>
 ## Configuration
 
 | Field | Meaning |
@@ -17,6 +40,9 @@ Consumer of `ctx.hxa`: the model-facing HXA tools. Registration is endpoint-gate
 | `maxInboxChannels` | Unread channels expanded per inbox check (default 5); overflow is named but not expanded. |
 | `maxChannelMessages` | Messages fetched per expanded channel (default 20). |
 
+-----
+
+<a id="model-experience"></a>
 ## Model Experience
 
 ### Org prompt section
@@ -58,6 +84,20 @@ Append-only; results follow the reusable request prefix and do not invalidate ex
 
 ## Known Limitations and Deferred Work
 
+<a id="known-limitations-and-deferred-work"></a>
+
 - The inbox watermark is process-local: a restart re-reads the default window instead of resuming durably.
 - Replies arrive only when the model checks `hxa_inbox`; push delivery into the agent inbox is the planned sibling Consumer.
 - No thread participation tools yet (create/join/messages/artifacts).
+
+<a id="dev-note"></a>
+### Dev Note
+
+<details>
+<summary>Working context for maintainers — click to expand</summary>
+
+None.
+
+</details>
+
+**Runtime invariant:** No companion is published. The tools add no session event type; their calls and results are ordinary tool events.

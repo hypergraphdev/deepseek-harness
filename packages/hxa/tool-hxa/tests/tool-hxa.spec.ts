@@ -3,7 +3,7 @@ import { createServer } from 'node:http'
 import type { IncomingMessage, Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { Context } from '@deepseek-ai/cordis'
-import { CallId } from '@deepseek-ai/dsh-llm'
+import { ToolCallId } from '@deepseek-ai/dsh-llm'
 import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
 import ToolRuntime from '@deepseek-ai/dsh-tools'
 import HxaRuntime from '@deepseek-ai/dsh-hxa'
@@ -51,7 +51,7 @@ async function mountAll(port: number | undefined, config: ToolHxa.Config = {}) {
   await ctx.plugin(HxaRuntime, { ...(port === undefined ? {} : { url: `http://127.0.0.1:${port}` }), tokenEnv: TOKEN_ENV })
   const fiber = await ctx.plugin(ToolHxa, config)
   let counter = 0
-  const call = (name: string, args: unknown) => ctx.tools.execute({ signal, callId: CallId(`call-${++counter}`), name, arguments: args })
+  const call = (name: string, args: unknown) => ctx.tools.execute({ signal, callId: ToolCallId(`call-${++counter}`), name, arguments: args })
   return { ctx, fiber, call }
 }
 

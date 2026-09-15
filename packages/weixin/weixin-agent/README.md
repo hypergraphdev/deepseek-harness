@@ -1,11 +1,34 @@
+---
+description: "Consumer of `ctx.weixin` and `ctx.agents`: WeChat as a conversation with the harness agent."
+kind: "package-reference"
+---
+
 # @deepseek-ai/dsh-weixin-agent
 
 English | [中文](README.zh.md)
 
+## Summary
+
 Consumer of `ctx.weixin` and `ctx.agents`: WeChat as a conversation with the harness agent. An inbound message wakes a dedicated agent, and the assistant text that closes that turn is sent straight back to whoever wrote in.
+
+## Table of Contents
+
+- [Use this package](#use-this-package)
+- [Configuration](#configuration)
+- [Model Experience](#model-experience)
+- [Known Limitations and Deferred Work](#known-limitations-and-deferred-work)
+- [Dev Note](#dev-note)
+
+-----
+
+<a id="use-this-package"></a>
+## Use this package
 
 The reply travels through this bridge rather than a tool, because the conversation has exactly one destination — the sender. The model therefore needs no WeChat vocabulary. Dormant while no account is linked: the agent is created by the first inbound message, so a deployment that never links an account persists no session for WeChat. The agent handle's failure never costs the WeChat connection.
 
+-----
+
+<a id="configuration"></a>
 ## Configuration
 
 | Field | Meaning |
@@ -14,6 +37,9 @@ The reply travels through this bridge rather than a tool, because the conversati
 | `provider` / `model` | Agent route; omitted uses the deployment default. |
 | `replyMaxChars` | Cap on one outbound reply (default 2000); longer text is truncated. |
 
+-----
+
+<a id="model-experience"></a>
 ## Model Experience
 
 ### Chat persona
@@ -55,6 +81,20 @@ Append-only; newly visible content follows the reusable request prefix and does 
 
 ## Known Limitations and Deferred Work
 
+<a id="known-limitations-and-deferred-work"></a>
+
 - The reply is the turn's final assistant text, so a turn that produces only tool output sends nothing back.
 - One shared agent serves every WeChat sender, so separate people share one conversation and its history.
 - A reply longer than `replyMaxChars` is truncated rather than split across messages.
+
+<a id="dev-note"></a>
+### Dev Note
+
+<details>
+<summary>Working context for maintainers — click to expand</summary>
+
+None.
+
+</details>
+
+**Runtime invariant:** No companion is published. The bridge adds no session event type; the notices it delivers are ordinary `user/message` events.

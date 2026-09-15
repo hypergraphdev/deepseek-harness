@@ -3,11 +3,13 @@
  * with the account-linking panel. The section renders nothing while the host
  * has no WeChat capability, so an unconfigured deployment shows no entry.
  */
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
 // Type-only: pulls the ui-settings SlotMap merge (the settings.section seat).
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 // Type-only: pulls the locale plugin's Context merge (ctx.locale).
 import type {} from '@deepseek-ai/dsh-client-locale/client'
+// Type-only: the ctx.slots Context merge.
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import { WeixinSection } from './WeixinSection.tsx'
 import { en, zh, type WeixinKey } from './locales.ts'
 

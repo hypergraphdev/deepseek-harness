@@ -1,11 +1,34 @@
+---
+description: "Consumer of `ctx.hxa` and `ctx.agents`: the inbound bridge that makes the harness bot a live, addressable teammate."
+kind: "package-reference"
+---
+
 # @deepseek-ai/dsh-hxa-inbound
 
 English | [中文](README.zh.md)
 
+## Summary
+
 Consumer of `ctx.hxa` and `ctx.agents`: the inbound bridge that makes the harness bot a live, addressable teammate. It holds one hub WebSocket so the bot shows **online** (presence), and wakes a dedicated coordinator agent on each inbound direct message; the coordinator answers through its own `hxa_send`.
+
+## Table of Contents
+
+- [Use this package](#use-this-package)
+- [Configuration](#configuration)
+- [Model Experience](#model-experience)
+- [Known Limitations and Deferred Work](#known-limitations-and-deferred-work)
+- [Dev Note](#dev-note)
+
+-----
+
+<a id="use-this-package"></a>
+## Use this package
 
 Presence and the coordinator are independent lifecycles — a coordinator failure never costs presence, and the socket reconnects with capped backoff. Dormant while `ctx.hxa` has no endpoint.
 
+-----
+
+<a id="configuration"></a>
 ## Configuration
 
 | Field | Meaning |
@@ -14,6 +37,9 @@ Presence and the coordinator are independent lifecycles — a coordinator failur
 | `provider` / `model` | Coordinator route; omitted uses the deployment default. |
 | `reconnectMaxMs` | Maximum reconnect backoff (default 30000). |
 
+-----
+
+<a id="model-experience"></a>
 ## Model Experience
 
 ### Coordinator persona
@@ -57,7 +83,21 @@ Append-only; newly visible content follows the reusable request prefix and does 
 
 ## Known Limitations and Deferred Work
 
+<a id="known-limitations-and-deferred-work"></a>
+
 - A message arriving before the coordinator agent has finished starting is dropped (the sender still holds it in channel history); there is no startup replay.
 - Only direct-message `message` frames are delivered; thread invitations, thread messages, and artifact events are not yet bridged.
 - One coordinator per process serves every inbound DM; there is no per-sender or per-topic routing.
 - The bot token is read from the environment through `ctx.hxa`, not through `ctx.credentials`.
+
+<a id="dev-note"></a>
+### Dev Note
+
+<details>
+<summary>Working context for maintainers — click to expand</summary>
+
+None.
+
+</details>
+
+**Runtime invariant:** No companion is published. The bridge adds no session event type; the notices it delivers are ordinary `user/message` events.

@@ -11,7 +11,6 @@ This repository is an independent edition of [deepseek-ai/deepseek-harness](http
 - Adds `apps/extension/`: a Manifest V3 extension that opens the dsh Web GUI in the browser side panel from the toolbar icon;
 - Starts the local `dsh web` server on demand through a native-messaging host (`dsh install-browser-host --extension <id>` registers it once; both source and built launches are supported);
 - The embedded app's iframe explicitly delegates `microphone` and `clipboard-write`. A cross-origin iframe is granted neither by default, and without the latter a message's copy button fails silently;
-- Commits: `051b610f`, `894bbee2`, `90ce867b`, `c6e053d3`.
 
 ### 2. Page context and article capture
 
@@ -20,13 +19,11 @@ This repository is an independent edition of [deepseek-ai/deepseek-harness](http
 - **Images in the article** become absolute-URL Markdown image links — the model receives the address and alt text, not pixels. An image-capable model can then call `read_image` on the one that matters;
 - **Site adapters**: pages whose numbers never touch the DOM (quotes, candlesticks) go through configured adapters — `match` on hostname, `capture` parameters from the URL or DOM, `request` a public endpoint, `extract` the fields worth sending, delivered alongside the article as `<site_data>`. **The engine ships no site knowledge**; adapters live in your own `apps/extension/site-adapters.json` (gitignored — the repository carries only `site-adapters.example.json`);
 - **In-page stream sniffing**: for hosts that declare `sniff` in an adapter, and only those, a `window.WebSocket` wrapper is registered into the MAIN world at `document_start`. It decodes the site's own frames, merges the series by bar time, and publishes them for extraction — **read-only**: it sends no frames and changes no application behavior. This is the only way to read charts like TradingView, where the data exists solely on the socket;
-- Commits: `4e1e15a3`, `d4899824`, `848d2993`, `275c692a`, `76c4c068`.
 
 ### 3. Voice input
 
 - A microphone button in the composer toolbar dictates through the Web Speech API; the transcript is appended through the draft state machine, so undo, command tokens, and submit behave exactly as if typed;
 - Inside the side panel, recognition runs on the extension's own top-level page and bridges its results back to the app (Chrome refuses the Web Speech API to a cross-origin iframe), with a one-time extension page for granting the microphone;
-- Commits: `0b81b3cf`, `44f340a5`, `90ce867b`.
 
 ### 4. AI team: local experts and remote teammates
 
@@ -34,7 +31,7 @@ This turns the workstation from "one agent" into "your standing seat plus a team
 
 **Local experts (in-process, no server at all)** — the main agent starts a local CLI on a sentence and brings the answer back:
 
-- Adds the `codex` and `claude_code` delegation tools (`dsh-base` composes upstream's own `subagent-codex` / `subagent-claude-code` providers), which run the official CLI in the session workspace and return the final answer of a one-shot task;
+- Mounts upstream's `subagent-codex` / `subagent-claude-code` providers in `dsh-base` and enables their `subagent_codex` / `subagent_claude_code` delegation tools in the shipped agent presets, which run the official CLI in the session workspace and return the final answer of a one-shot task;
 - "Have codex look at this code" is enough — no hub, no daemon in the path.
 
 **HXA team (across machines, persistently online)** — adds the `packages/hxa/` capability family over a self-hosted [HXA Connect](https://github.com/hypergraphdev/hxa-connect) hub:
@@ -44,13 +41,11 @@ This turns the workstation from "one agent" into "your standing seat plus a team
 - `dsh-hxa-inbound`: the **inbound bridge** — one WebSocket keeps the local bot online (presence and the coordinator are independent, so neither failure costs the other), and each teammate message wakes a coordinator agent carrying the `hxa:coordinator` persona, which answers through its own `hxa_send`. Messages land via `followup` as a durable `user/message`, satisfying model-visible ⟺ logged;
 - Bridge-created agents take the deployment's default model explicitly: the persona's `{{model}}` variable resolves from the agent's own options, so leaving it unset fails prompt assembly before the model is ever called. Their fixed session ids are resume-or-create — persistence refuses to create over an existing log, so a create-only bridge collides on its own id on every run after the first;
 - `scripts/connect-teammate.sh <teammate>`: one command hangs a local CLI into the org as an online teammate (reading `HXA_HUB_URL` / `HXA_<NAME>_TOKEN` from the environment or `.env`, with no hardcoded paths; `SLOCK_DAEMON_PACKAGE` can point the daemon at a local checkout);
-- Commits: `930b5bc6`, `ae1ee795`, `b9ad8615`, `cb959a02`, `95fe159f`, `c6e053d3`, `d987d77d`.
 
 ### 5. Agents sidebar panel
 
 - Adds the `sidebar.agents` slot and the `dsh-client-ui-agents` plugin: a read-only team roster, one row per teammate (presence dot plus role), refreshed on a 20-second poll;
 - Data comes from `ctx.hxa` through the host's new same-origin `GET /api/hxa/contacts` route (exact-match routing, cross-site requests refused). While HXA is dormant the route returns 404 and the panel does not render at all, so an unconfigured deployment spends no pixels;
-- Commit: `668eb169`.
 
 ### 6. WeChat entry point (scan once)
 
@@ -61,13 +56,11 @@ WeChat becomes an entry point to the main agent: you write in WeChat, the local 
 - While the turn runs, the chat shows a typing indicator so waiting has feedback. Every indicator failure is swallowed — a missing dot is not worth costing a reply;
 - The settings page gains a WeChat section: a QR code while unlinked, and only the account plus an unlink button once linked. **The QR is encoded locally in the panel** — handing the payload to a third-party image service would be handing over the login credential;
 - Dormant by default: with no stored credential the service opens no connection and the section shows as unlinked;
-- Commits: `c6ef2c8c`, `c6e053d3`, `d987d77d`.
 
 ### 7. Interface polish
 
 - The settings page's left navigation gains text labels, with icons distinguished per section (messaging sections use a conversation icon, leaving room for platforms beyond WeChat);
 - A message's copy button works again inside the side panel (see the iframe permission delegation in section 1);
-- Commit: `c6e053d3`.
 
 ## Quick start
 
@@ -80,6 +73,10 @@ pnpm dsh install-browser-host --extension <your-extension-id>
 
 2. In `chrome://extensions`, enable Developer mode, choose "Load unpacked" and select `apps/extension/`, then re-run the command above with the extension id you get;
 3. Click the toolbar icon to open the side panel.
+
+### Read images (no setup)
+
+Select an image-capable model such as `deepseek-flash` (DeepSeek-V41-Flash); uploaded images and images read through `read_image` reach it directly.
 
 ### Configure site adapters (optional, needed for structured site data)
 

@@ -4,11 +4,13 @@
  * `/api/hxa/contacts` route and renders nothing while HXA is dormant, so the
  * seat costs unconfigured deployments no pixels.
  */
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
 // Type-only: pulls the ui-sidebar seat's existence (SidebarRoot renders it).
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 // Type-only: pulls the locale plugin's Context merge (ctx.locale).
 import type {} from '@deepseek-ai/dsh-client-locale/client'
+// Type-only: the ctx.slots Context merge.
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import { AgentsPanel } from './AgentsPanel.tsx'
 import { en, zh, type AgentsKey } from './locales.ts'
 

@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/hxa/hxa/README.md
-README.md: 5af8814acb5dfeac355f202f69a0707569150e23
-README.zh.md: 836b8664ac0ceb64001b3dfffba1b56e1adb8b71
+README.md: 7ccd17ae728dc6d37540605fee4b0c470ea0b6f0
+README.zh.md: 2ef4ef25e142b2485b709ac056022da194128d28

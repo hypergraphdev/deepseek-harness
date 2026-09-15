@@ -20,7 +20,7 @@ import type {} from '@deepseek-ai/dsh-weixin'
 import type {} from '@deepseek-ai/dsh-system-prompt'
 import type {} from '@deepseek-ai/dsh-agent-default-model'
 // Type-only: resolves `ctx.get('sessionPersistence')` for the resume-or-create probe.
-import type {} from '@deepseek-ai/dsh-session-persistence'
+import { SessionPersistenceNotFoundError } from '@deepseek-ai/dsh-session-persistence'
 
 /** Cordis plugin name used by loader diagnostics. */
 export const name = 'weixin-agent'
@@ -85,11 +85,10 @@ export function apply(ctx: Context, config: Config): void {
           provider: config.provider ?? fallback?.provider,
           model: config.model ?? fallback?.model,
         }
-        // A fixed session id outlives the process, and the persistence layer
-        // refuses to create over an existing log — so resume when one is
-        // already on disk and create only the first time.
+        // A fixed session id outlives the process: resume the stored session,
+        // and create it only when persistence reports it absent. Corruption,
+        // ownership conflicts, and backend failures stay loud.
         const sessionId = SessionId(config.sessionId ?? 'weixin-main')
-        const persisted = await agentCtx.get('sessionPersistence')?.inspect(sessionId).catch(() => undefined)
         const shared = {
           ...(options.provider === undefined || options.model === undefined
             ? {}
@@ -99,9 +98,15 @@ export function apply(ctx: Context, config: Config): void {
             world.systemPrompt.section({ name: 'weixin:persona', order: 0, text: WEIXIN_PERSONA })
           },
         }
-        const handle = persisted === undefined
-          ? await agentCtx.agents.create({ sessionId, meta: { cwd: process.cwd() }, ...shared })
-          : await agentCtx.agents.resume({ resumeSessionId: sessionId, ...shared })
+        const open = async (): Promise<Awaited<ReturnType<typeof agentCtx.agents.create>>> => {
+          try {
+            return await agentCtx.agents.resume({ resumeSessionId: sessionId, ...shared })
+          } catch (error: unknown) {
+            if (!(error instanceof SessionPersistenceNotFoundError)) throw error
+            return await agentCtx.agents.create({ sessionId, meta: { cwd: process.cwd() }, ...shared })
+          }
+        }
+        const handle = await open()
         if (cancelled) { await handle.dispose(); return undefined }
         dispose = () => handle.dispose()
         live = { agent: handle.agent, session: handle.agent.session }

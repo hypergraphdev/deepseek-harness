@@ -1,11 +1,34 @@
+---
+description: "`ctx.weixin` 与 `ctx.agents` 的 Consumer：把微信变成与 harness agent 的对话。"
+kind: "package-reference"
+---
+
 # @deepseek-ai/dsh-weixin-agent
 
 [English](README.md) | 中文
 
+## 概述
+
 `ctx.weixin` 与 `ctx.agents` 的 Consumer：把微信变成与 harness agent 的对话。入站消息唤醒专属 agent，该回合收尾的 assistant 文本径直回送给来信的人。
+
+## 目录
+
+- [使用本包](#use-this-package)
+- [配置](#configuration)
+- [Model Experience](#model-experience)
+- [Known Limitations and Deferred Work](#known-limitations-and-deferred-work)
+- [开发备注](#dev-note)
+
+-----
+
+<a id="use-this-package"></a>
+## 使用本包
 
 回复经由这座桥而不是工具，因为对话有且只有一个目的地——发信人。模型因此不需要任何微信词汇。未绑定账号时保持休眠：agent 由第一条入站消息创建，因此从未绑定过账号的部署不会为微信留下任何会话。agent 句柄的失败也绝不连累微信连接。
 
+-----
+
+<a id="configuration"></a>
 ## 配置
 
 | 字段 | 含义 |
@@ -14,6 +37,9 @@
 | `provider` / `model` | agent 路由；缺省用部署默认值。 |
 | `replyMaxChars` | 单条出站回复的上限（默认 2000）；更长的文本被截断。 |
 
+-----
+
+<a id="model-experience"></a>
 ## Model Experience
 
 ### 聊天人格
@@ -55,6 +81,20 @@ You speak in the user's name; route irreversible or outward-facing decisions bac
 
 ## Known Limitations and Deferred Work
 
+<a id="known-limitations-and-deferred-work"></a>
+
 - 回复取自回合最终的 assistant 文本，只产生工具输出的回合不会回送任何内容。
 - 一个共享 agent 服务所有微信发信人，不同的人共用一段对话及其历史。
 - 超过 `replyMaxChars` 的回复被截断，而不是拆成多条消息。
+
+<a id="dev-note"></a>
+### 开发备注
+
+<details>
+<summary>维护者的工作上下文——点击展开</summary>
+
+无。
+
+</details>
+
+**运行时不变式：** 不发布伴生入口。该桥不新增会话事件类型；它投递的 notice 是普通的 `user/message` 事件。

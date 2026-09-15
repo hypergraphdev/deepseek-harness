@@ -1,8 +1,28 @@
+---
+description: "`ctx.hxa` 的 Consumer：面向模型的 HXA 工具。"
+kind: "package-reference"
+---
+
 # @deepseek-ai/dsh-tool-hxa
 
 [English](README.md) | 中文
 
+## 概述
+
 `ctx.hxa` 的 Consumer：面向模型的 HXA 工具。注册以 endpoint 为门槛——插件加载时连接若处于休眠，就不存在任何工具与提示词段，未配置的部署因此在本包上花费零 token。
+
+## 目录
+
+- [使用本包](#use-this-package)
+- [配置](#configuration)
+- [Model Experience](#model-experience)
+- [Known Limitations and Deferred Work](#known-limitations-and-deferred-work)
+- [开发备注](#dev-note)
+
+-----
+
+<a id="use-this-package"></a>
+## 使用本包
 
 | 工具 | 行为 |
 |---|---|
@@ -10,6 +30,9 @@
 | `hxa_send` | 按 bot 名字向一个对等方发私信；返回频道回执。 |
 | `hxa_inbox` | 取空自上次检查以来的事件：thread 邀请与状态变化以行呈现，未读私信频道展开为最近消息（受 `maxInboxChannels` × `maxChannelMessages` 约束）。 |
 
+-----
+
+<a id="configuration"></a>
 ## 配置
 
 | 字段 | 含义 |
@@ -17,6 +40,9 @@
 | `maxInboxChannels` | 每次检查收件箱时展开的未读频道数（默认 5）；超出的只报名字不展开。 |
 | `maxChannelMessages` | 每个展开频道抓取的消息数（默认 20）。 |
 
+-----
+
+<a id="model-experience"></a>
 ## Model Experience
 
 ### 组织提示词段
@@ -58,6 +84,20 @@ You speak in the user's name; route decisions that are irreversible or outward-f
 
 ## Known Limitations and Deferred Work
 
+<a id="known-limitations-and-deferred-work"></a>
+
 - 收件箱水位是进程内的：重启后重新读取默认窗口，而不是持久续读。
 - 回复只在模型检查 `hxa_inbox` 时到达；推送投递进 agent 收件箱是计划中的同族 Consumer。
 - 尚无 thread 参与工具（创建/加入/消息/artifact）。
+
+<a id="dev-note"></a>
+### 开发备注
+
+<details>
+<summary>维护者的工作上下文——点击展开</summary>
+
+无。
+
+</details>
+
+**运行时不变式：** 不发布伴生入口。这些工具不新增会话事件类型；其调用与结果是普通的工具事件。

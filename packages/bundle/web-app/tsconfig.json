@@ -24,6 +24,9 @@
       "path": "../../boot/cmdline"
     },
     {
+      "path": "../../client/connection/tsconfig.host.json"
+    },
+    {
       "path": "../../host/frontend-static"
     },
     {
@@ -42,7 +45,7 @@
       "path": "../../llm/llm"
     },
     {
-      "path": "../../host/apiproxy"
+      "path": "../../api/session-controller/tsconfig.host.json"
     },
     {
       "path": "../../hxa/hxa"
@@ -55,9 +58,6 @@
     },
     {
       "path": "../../subprocess/subprocess"
-    },
-    {
-      "path": "../../runtime-diagnostics/invariants"
     }
   ]
 }

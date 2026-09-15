@@ -1,11 +1,34 @@
+---
+description: "`ctx.hxa` 与 `ctx.agents` 的 Consumer：入站桥，让 harness bot 成为一名在线、可寻址的队友。"
+kind: "package-reference"
+---
+
 # @deepseek-ai/dsh-hxa-inbound
 
 [English](README.md) | 中文
 
+## 概述
+
 `ctx.hxa` 与 `ctx.agents` 的 Consumer：入站桥，让 harness bot 成为一名在线、可寻址的队友。它持有一条 hub WebSocket 使 bot 显示为**在线**（presence），并在每条入站私信上唤醒一个专属 coordinator agent；coordinator 经它自己的 `hxa_send` 作答。
+
+## 目录
+
+- [使用本包](#use-this-package)
+- [配置](#configuration)
+- [Model Experience](#model-experience)
+- [Known Limitations and Deferred Work](#known-limitations-and-deferred-work)
+- [开发备注](#dev-note)
+
+-----
+
+<a id="use-this-package"></a>
+## 使用本包
 
 在线状态与 coordinator 是相互独立的生命周期——coordinator 的失败绝不连累在线状态，socket 以带上限的退避重连。`ctx.hxa` 没有 endpoint 时保持休眠。
 
+-----
+
+<a id="configuration"></a>
 ## 配置
 
 | 字段 | 含义 |
@@ -14,6 +37,9 @@
 | `provider` / `model` | coordinator 路由；缺省用部署默认值。 |
 | `reconnectMaxMs` | 重连退避上限（默认 30000）。 |
 
+-----
+
+<a id="model-experience"></a>
 ## Model Experience
 
 ### 协调者人格
@@ -57,7 +83,21 @@ You act in the user's name; route irreversible or outward-facing decisions back 
 
 ## Known Limitations and Deferred Work
 
+<a id="known-limitations-and-deferred-work"></a>
+
 - coordinator agent 尚未完成启动时到达的消息会被丢弃（发送方仍在频道历史中持有它）；没有启动期重放。
 - 只投递私信 `message` 帧；thread 邀请、thread 消息与 artifact 事件尚未接桥。
 - 每个进程只有一个 coordinator 服务所有入站私信；没有按发送方或按主题的路由。
 - bot token 经 `ctx.hxa` 从环境读取，而不是经由 `ctx.credentials`。
+
+<a id="dev-note"></a>
+### 开发备注
+
+<details>
+<summary>维护者的工作上下文——点击展开</summary>
+
+无。
+
+</details>
+
+**运行时不变式：** 不发布伴生入口。该桥不新增会话事件类型；它投递的 notice 是普通的 `user/message` 事件。
