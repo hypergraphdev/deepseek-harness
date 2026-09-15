@@ -114,7 +114,6 @@
     "@deepseek-ai/dsh-typert-registry": "workspace:^",
     "@deepseek-ai/dsh-user-approval": "workspace:^",
     "@deepseek-ai/dsh-user-questions": "workspace:^",
-    "@deepseek-ai/dsh-vision-bridge": "workspace:^",
     "@deepseek-ai/dsh-hxa": "workspace:^",
     "@deepseek-ai/dsh-hxa-inbound": "workspace:^",
     "@deepseek-ai/dsh-weixin": "workspace:^",

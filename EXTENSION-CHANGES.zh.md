@@ -17,24 +17,18 @@
 
 - **上下文**：侧边栏内提问时，Agent 自动知道当前活动标签页（含本地 `file://` 文档，如 PDF）；关闭页面后有显式的"无活动页面"更正快照，杜绝过期上下文；上下文作为持久 `user/message` source 元数据入会话日志，满足上游"模型可见 ⟺ 已记录"不变式；同页去重，只在变化时注入一次快照；
 - **读取本页正文**：右下角"📄 读取本页"按钮，把当前标签页**结构化**成 Markdown 随下一条消息发出——先按"文字量 ÷ 链接密度"给候选容器打分挑出正文根（阅读模式那套），再保留标题层级、表格、带语言标注的代码块、列表、引用、链接和图片；登录后的页面、JS 渲染的阅读器都能读，这是 `web_fetch` 抓不到的；你的选中文字一并带上；正文一次性使用、发完即清；
-- **正文里的图片**转成绝对 URL 的 Markdown 图片链接（模型拿到的是地址和 alt，不是像素）；配合下面的 vision-bridge，再让模型用 `read_image` 去读具体那张图；
+- **正文里的图片**转成绝对 URL 的 Markdown 图片链接（模型拿到的是地址和 alt，不是像素）；模型支持图片输入时，再用 `read_image` 去读具体那张图；
 - **站点适配器**：数字根本不进 DOM 的页面（行情、K 线）走配置化适配器——`match` 匹主机名 → `capture` 从 URL/DOM 取参数 → `request` 拉公开接口 → `extract` 挑字段，结果作为 `<site_data>` 一并发出。**引擎不内置任何站点知识**，适配器是你自己的 `apps/extension/site-adapters.json`（已 gitignore，仓库里只有 `site-adapters.example.json` 示例）；
 - **页内流嗅探**：只对在适配器里声明了 `sniff` 的站点，在 `document_start` 往 MAIN world 注入一个 `window.WebSocket` 包装，解码站点自己的帧、按时间合并序列后挂到页面上供抽取——**只读不改**，不发任何帧、不动业务逻辑，这是读 TradingView 这类"数据只走 WebSocket"图表的唯一办法；
 - 提交：`4e1e15a3`、`d4899824`、`848d2993`、`275c692a`、`76c4c068`。
 
-### 3. vision-bridge 多模态读图（含链路修复）
-
-- `vision-bridge` 让纯文本模型（如 DeepSeek-V4-Flash）借助本地多模态模型（如 ollama 的 gemma4）读图：请求因图片被拒时自动转写为文字描述并重试，另提供 `analyze_image` 工具追问细节；
-- 本版修复了两处链路缺口：`read_image` 工具的路由门禁认可已武装的桥接；工具结果（tool/result）内嵌图片同样被转写，且替换保持 call/result 配对；
-- 提交：`4683f0e5`、`cfafe74d`、`a3f3f786`。
-
-### 4. 语音输入（Voice Input）
+### 3. 语音输入（Voice Input）
 
 - 输入框工具栏新增麦克风按钮，基于 Web Speech API 听写，转写文字经草稿状态机追加（撤销/命令 token/发送行为与手打一致）；
 - 侧边栏内识别运行在扩展顶级页面并桥接回应用（绕过 Chrome 对跨源 iframe 的 Web Speech 限制），配套一次性的扩展麦克风授权页；
 - 提交：`0b81b3cf`、`44f340a5`、`90ce867b`。
 
-### 5. AI 团队：本机专家 + 远程队友
+### 4. AI 团队：本机专家 + 远程队友
 
 把工作台从「单个 agent」变成「你的常驻席位 + 一支可召唤的团队」。两条互补的路径：
 
@@ -52,13 +46,13 @@
 - `scripts/connect-teammate.sh <teammate>`：一条命令把本机 CLI 挂成 org 里的在线队友（读环境或 `.env` 的 `HXA_HUB_URL` / `HXA_<NAME>_TOKEN`，零硬编码路径，daemon 包可用 `SLOCK_DAEMON_PACKAGE` 覆盖为本地 checkout）；
 - 提交：`930b5bc6`、`ae1ee795`、`b9ad8615`、`cb959a02`、`95fe159f`、`c6e053d3`、`d987d77d`。
 
-### 6. 侧边栏 Agents 面板
+### 5. 侧边栏 Agents 面板
 
 - 侧栏新增 `sidebar.agents` 座位与 `dsh-client-ui-agents` 插件：只读团队花名册，每行一个队友（在线绿点 + 角色），20 秒轮询刷新；
 - 数据经宿主新增的同源 `GET /api/hxa/contacts` 路由（精确路由，拒绝跨站请求）取自 `ctx.hxa`；HXA 休眠时路由返回 404、面板整个不渲染，未配置的部署一个像素都不占；
 - 提交：`668eb169`。
 
-### 7. 微信接入（扫码即用）
+### 6. 微信接入（扫码即用）
 
 让微信成为主 agent 的一个入口：在微信里发消息，本机智能体回答，回复直接发回聊天。
 
@@ -69,7 +63,7 @@
 - 默认休眠：没有存储凭证时，服务不建连接、分区显示未关联；
 - 提交：`c6ef2c8c`、`c6e053d3`、`d987d77d`。
 
-### 8. 界面打磨
+### 7. 界面打磨
 
 - 设置页左侧导航补上文字标签，图标按分区区分（消息类分区用会话图标，为将来接入微信之外的平台留位）；
 - 消息的复制按钮在侧边栏里恢复可用（见第 1 节的 iframe 权限委派）；
@@ -86,36 +80,6 @@ pnpm dsh install-browser-host --extension <你的扩展id>
 
 2. `chrome://extensions` 开启开发者模式，"加载已解压的扩展程序"选择 `apps/extension/`，记下扩展 id 后重跑上一步；
 3. 点工具栏图标打开侧边栏即用。
-
-### 启用 vision-bridge（可选，读图能力需要）
-
-vision-bridge 需要一个**本地多模态模型**做转写引擎，先安装 [ollama](https://ollama.com) 并拉取模型：
-
-```sh
-brew install ollama          # 或从 ollama.com 下载安装包
-ollama pull gemma4:12b       # 多模态小模型，约 7.6 GB；任何支持图片输入的模型均可
-ollama serve                 # 桌面版 ollama 会自动常驻，可跳过这步
-```
-
-然后在 `~/.dsh/settings.yaml` 配置**两段**：先把 ollama 注册为 provider，再指给 vision-bridge（只配后一段会因 provider 不存在而失效）：
-
-```yaml
-llm-pi-ai:
-  providers:
-    ollama:
-      displayName: ollama
-      apiKeyEnv: OLLAMA_API_KEY
-      api: openai-completions
-      baseURL: http://127.0.0.1:11434/v1
-      defaultInput: [ text, image ]
-      models:
-        - id: gemma4:12b
-vision-bridge:
-  provider: ollama
-  model: gemma4:12b
-```
-
-配置热加载，无需重启。生效后：文本模型的会话里上传图片、`read_image` 读本地图片都会经 gemma4 自动转写为文字描述，模型还可用 `analyze_image` 工具对图追问。注意键名全部小写（`model:` 写成 `Model:` 会被丢弃导致半配置休眠）。
 
 ### 配置站点适配器（可选，站点结构化数据需要）
 

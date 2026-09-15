@@ -5,9 +5,9 @@
  */
 
 import type { Context } from '@deepseek-ai/cordis'
-import { contentHasImage, createUserMessage, BlockAssembler, finishReasonError, LlmError } from '@deepseek-ai/dsh-llm'
+import { contentHasImage, createUserMessage, BlockAssembler, LlmError } from '@deepseek-ai/dsh-llm'
 import type {
-  ContentBlock, GenerateOptions, Message, TokenUsage, ToolSchema,
+  ContentBlock, FinishReason, GenerateOptions, Message, TokenUsage, ToolSchema,
 } from '@deepseek-ai/dsh-llm'
 import type { Agent } from '@deepseek-ai/dsh-agent'
 
@@ -162,7 +162,7 @@ export async function summarizeWithLlm(
     ...signal === undefined ? {} : { signal },
   }
   for await (const chunk of ctx.llm.stream(options)) assembler.push(chunk)
-  const error = finishReasonError(assembler.finish, 'summarization truncated at the token cap (incomplete checkpoint)')
+  const error = finishError(assembler.finish)
   if (error !== undefined) throw error
 
   const rawOutput = assembler.blocks()
@@ -192,6 +192,25 @@ export function frameSummary(summary: readonly ContentBlock[]): ContentBlock[] {
     ...summary,
     { type: 'text', text: SUMMARY_CLOSE_TAG },
   ]
+}
+
+/** Map a terminal summarization finish to its fail-closed error. */
+function finishError(finish: FinishReason): Error | undefined {
+  switch (finish.kind) {
+    case 'error':
+    case 'aborted': {
+      const error = new Error(finish.failure.message) as Error & { code?: string }
+      error.code = finish.failure.code
+      return error
+    }
+    case 'max-tokens': {
+      const error = new Error('summarization truncated at the token cap (incomplete checkpoint)') as Error & { code?: string }
+      error.code = 'MAX_TOKENS'
+      return error
+    }
+    default:
+      return undefined
+  }
 }
 
 /** Reject visual output and keep only text before synthesizing a user message. */

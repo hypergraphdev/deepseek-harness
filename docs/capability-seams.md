@@ -118,8 +118,6 @@ flowchart LR
   svc_weixin["ctx.weixin<br/>QR-linked WeChat account"]
   pkg_weixin_agent["weixin-agent"]
   pkg_web_app["web-app"]
-  pkg_vision_bridge["vision-bridge"]
-  svc_visionBridge["ctx.visionBridge<br/>Image transcription for text-only model routes"]
   svc_agentLoop["ctx.agentLoop<br/>Concrete loop driver"]
   pkg_agent_spine_demo["agent-spine-demo"]
   pkg_goal["goal"]
@@ -308,7 +306,6 @@ flowchart LR
   pkg_tools --> svc_tools
   pkg_typert_registry --> svc_typert
   pkg_user_questions --> svc_userQuestions
-  pkg_vision_bridge --> svc_visionBridge
   pkg_web --> svc_web
   pkg_web_fetch_http --> svc_web
   pkg_web_search_deepseek --> svc_web
@@ -428,7 +425,6 @@ flowchart LR
   svc_typert --> pkg_api_gateway
   svc_typert --> pkg_typert_loader
   svc_userQuestions --> pkg_tool_ask_user
-  svc_visionBridge --> pkg_host_apiproxy
   svc_web --> pkg_tool_web
   svc_webServer --> pkg_connection
   svc_webServer --> pkg_hmr
@@ -477,7 +473,6 @@ flowchart LR
 | `ctx.agentDefaultModel` | `core` | [`agent-default-model`](../packages/core/agent-default-model) | - | [`headless`](../packages/bundle/headless), [`host-apiproxy`](../packages/host/apiproxy) | - | Layers the default ModelSelection through settings so direct and Host-backed Agent entry points share one state owner. |
 | `ctx.hxa` | `seam` | [`hxa`](../packages/hxa/hxa) | - | [`tool-hxa`](../packages/hxa/tool-hxa), [`hxa-inbound`](../packages/hxa/hxa-inbound) | - | One bot identity on one hub: endpoint/credential resolution and the authenticated request path the team tools and inbound bridge consume. |
 | `ctx.weixin` | `seam` | [`weixin`](../packages/weixin/weixin) | - | [`weixin-agent`](../packages/weixin/weixin-agent), [`web-app`](../packages/bundle/web-app) | - | Linking, the durable credential, the receive loop dispatching weixin/message, and outbound text; weixin-agent bridges the conversation. |
-| `ctx.visionBridge` | `core` | [`vision-bridge`](../packages/llm/vision-bridge) | - | [`host-apiproxy`](../packages/host/apiproxy) | - | Repairs UNSUPPORTED_CONTENT steps by transcribing logged images through a configured multimodal route; the host consults it to admit images on text-only routes. |
 | `ctx.agentLoop` | `bundle` | [`agent-loop`](../packages/core/agent-loop) | - | [`agent-spine-demo`](../packages/examples/agent-spine-demo) | - | The one concrete loop plugin; extension packages depend on dsh-agent events and services, not on this package. |
 | `ctx.goals` | `core` | [`goal`](../packages/goal/goal) | - | - | - | Folds revisioned objective state from the session log and keeps live continuation activation process-local. |
 | `ctx.e2b` | `core` | [`e2b`](../packages/e2b/e2b) | - | [`fs-e2b`](../packages/e2b/fs-e2b), [`subprocess-e2b`](../packages/e2b/subprocess-e2b) | - | Owns one shared E2B SDK handle, remote working directory, and final sandbox disposition so both fundamental E2B providers inhabit the same Linux runtime. |

@@ -17,24 +17,18 @@ This repository is an independent edition of [deepseek-ai/deepseek-harness](http
 
 - **Context**: asking from the side panel tells the agent which tab is active, local `file://` documents (such as PDFs) included. Closing the page emits an explicit "no active page" correction so stale context cannot linger. The context rides the durable `user/message` source metadata into the session log, satisfying upstream's model-visible ⟺ logged invariant; a repeated page is deduplicated, so a snapshot is injected only on change;
 - **Read this page**: the "📄 Read page" control turns the active tab into **structured Markdown** carried by your next message. Candidate containers are scored by text volume against link density to pick the article root (the reading-mode approach), then heading levels, tables, fenced code with its language, lists, quotes, links, and images are preserved. Logged-in pages and JS-rendered readers work, which is exactly what `web_fetch` cannot reach. Any selected text comes along. The capture is one-shot and cleared once sent;
-- **Images in the article** become absolute-URL Markdown image links — the model receives the address and alt text, not pixels. Combined with the vision bridge below, it can then call `read_image` on the one that matters;
+- **Images in the article** become absolute-URL Markdown image links — the model receives the address and alt text, not pixels. An image-capable model can then call `read_image` on the one that matters;
 - **Site adapters**: pages whose numbers never touch the DOM (quotes, candlesticks) go through configured adapters — `match` on hostname, `capture` parameters from the URL or DOM, `request` a public endpoint, `extract` the fields worth sending, delivered alongside the article as `<site_data>`. **The engine ships no site knowledge**; adapters live in your own `apps/extension/site-adapters.json` (gitignored — the repository carries only `site-adapters.example.json`);
 - **In-page stream sniffing**: for hosts that declare `sniff` in an adapter, and only those, a `window.WebSocket` wrapper is registered into the MAIN world at `document_start`. It decodes the site's own frames, merges the series by bar time, and publishes them for extraction — **read-only**: it sends no frames and changes no application behavior. This is the only way to read charts like TradingView, where the data exists solely on the socket;
 - Commits: `4e1e15a3`, `d4899824`, `848d2993`, `275c692a`, `76c4c068`.
 
-### 3. vision-bridge image reading (with pipeline fixes)
-
-- `vision-bridge` lets a text-only model (such as DeepSeek-V4-Flash) read images through a local multimodal model (such as ollama's gemma4): a request refused for carrying images is transcribed into text and retried, and an `analyze_image` tool answers follow-up questions about a specific image;
-- This edition closes two gaps in that pipeline: the `read_image` tool's route gate now accepts an armed bridge, and images embedded in tool results are transcribed as well, with the substitution keeping call/result pairing intact;
-- Commits: `4683f0e5`, `cfafe74d`, `a3f3f786`.
-
-### 4. Voice input
+### 3. Voice input
 
 - A microphone button in the composer toolbar dictates through the Web Speech API; the transcript is appended through the draft state machine, so undo, command tokens, and submit behave exactly as if typed;
 - Inside the side panel, recognition runs on the extension's own top-level page and bridges its results back to the app (Chrome refuses the Web Speech API to a cross-origin iframe), with a one-time extension page for granting the microphone;
 - Commits: `0b81b3cf`, `44f340a5`, `90ce867b`.
 
-### 5. AI team: local experts and remote teammates
+### 4. AI team: local experts and remote teammates
 
 This turns the workstation from "one agent" into "your standing seat plus a team you can call on", along two complementary paths.
 
@@ -52,13 +46,13 @@ This turns the workstation from "one agent" into "your standing seat plus a team
 - `scripts/connect-teammate.sh <teammate>`: one command hangs a local CLI into the org as an online teammate (reading `HXA_HUB_URL` / `HXA_<NAME>_TOKEN` from the environment or `.env`, with no hardcoded paths; `SLOCK_DAEMON_PACKAGE` can point the daemon at a local checkout);
 - Commits: `930b5bc6`, `ae1ee795`, `b9ad8615`, `cb959a02`, `95fe159f`, `c6e053d3`, `d987d77d`.
 
-### 6. Agents sidebar panel
+### 5. Agents sidebar panel
 
 - Adds the `sidebar.agents` slot and the `dsh-client-ui-agents` plugin: a read-only team roster, one row per teammate (presence dot plus role), refreshed on a 20-second poll;
 - Data comes from `ctx.hxa` through the host's new same-origin `GET /api/hxa/contacts` route (exact-match routing, cross-site requests refused). While HXA is dormant the route returns 404 and the panel does not render at all, so an unconfigured deployment spends no pixels;
 - Commit: `668eb169`.
 
-### 7. WeChat entry point (scan once)
+### 6. WeChat entry point (scan once)
 
 WeChat becomes an entry point to the main agent: you write in WeChat, the local agent answers, and the reply goes straight back to the chat.
 
@@ -69,7 +63,7 @@ WeChat becomes an entry point to the main agent: you write in WeChat, the local 
 - Dormant by default: with no stored credential the service opens no connection and the section shows as unlinked;
 - Commits: `c6ef2c8c`, `c6e053d3`, `d987d77d`.
 
-### 8. Interface polish
+### 7. Interface polish
 
 - The settings page's left navigation gains text labels, with icons distinguished per section (messaging sections use a conversation icon, leaving room for platforms beyond WeChat);
 - A message's copy button works again inside the side panel (see the iframe permission delegation in section 1);
@@ -86,36 +80,6 @@ pnpm dsh install-browser-host --extension <your-extension-id>
 
 2. In `chrome://extensions`, enable Developer mode, choose "Load unpacked" and select `apps/extension/`, then re-run the command above with the extension id you get;
 3. Click the toolbar icon to open the side panel.
-
-### Enable vision-bridge (optional, needed for image reading)
-
-vision-bridge needs a **local multimodal model** as its transcription engine. Install [ollama](https://ollama.com) and pull one:
-
-```sh
-brew install ollama          # or download the installer from ollama.com
-ollama pull gemma4:12b       # a small multimodal model, ~7.6 GB; any image-capable model works
-ollama serve                 # the desktop build runs this for you
-```
-
-Then configure **both** halves in `~/.dsh/settings.yaml` — register ollama as a provider first, then point vision-bridge at it (configuring only the second half leaves the bridge dormant, because the provider does not exist):
-
-```yaml
-llm-pi-ai:
-  providers:
-    ollama:
-      displayName: ollama
-      apiKeyEnv: OLLAMA_API_KEY
-      api: openai-completions
-      baseURL: http://127.0.0.1:11434/v1
-      defaultInput: [ text, image ]
-      models:
-        - id: gemma4:12b
-vision-bridge:
-  provider: ollama
-  model: gemma4:12b
-```
-
-Settings hot-reload; no restart needed. Once active, images uploaded in a text-model session and local images read through `read_image` are transcribed by gemma4, and the model can ask follow-up questions with `analyze_image`. Keys are case-sensitive — `Model:` instead of `model:` is dropped, leaving the bridge half-configured and dormant.
 
 ### Configure site adapters (optional, needed for structured site data)
 

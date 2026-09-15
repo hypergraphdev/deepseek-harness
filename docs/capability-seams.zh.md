@@ -120,8 +120,6 @@ flowchart LR
   svc_weixin["ctx.weixin<br/>QR-linked WeChat account"]
   pkg_weixin_agent["weixin-agent"]
   pkg_web_app["web-app"]
-  pkg_vision_bridge["vision-bridge"]
-  svc_visionBridge["ctx.visionBridge<br/>Image transcription for text-only model routes"]
   svc_agentLoop["ctx.agentLoop<br/>Concrete loop driver"]
   pkg_agent_spine_demo["agent-spine-demo"]
   pkg_goal["goal"]
@@ -310,7 +308,6 @@ flowchart LR
   pkg_tools --> svc_tools
   pkg_typert_registry --> svc_typert
   pkg_user_questions --> svc_userQuestions
-  pkg_vision_bridge --> svc_visionBridge
   pkg_web --> svc_web
   pkg_web_fetch_http --> svc_web
   pkg_web_search_deepseek --> svc_web
@@ -430,7 +427,6 @@ flowchart LR
   svc_typert --> pkg_api_gateway
   svc_typert --> pkg_typert_loader
   svc_userQuestions --> pkg_tool_ask_user
-  svc_visionBridge --> pkg_host_apiproxy
   svc_web --> pkg_tool_web
   svc_webServer --> pkg_connection
   svc_webServer --> pkg_hmr
@@ -479,7 +475,6 @@ flowchart LR
 | `ctx.agentDefaultModel` | `core` | [`agent-default-model`](../packages/core/agent-default-model) | - | [`headless`](../packages/bundle/headless), [`host-apiproxy`](../packages/host/apiproxy) | - | 通过 settings 分层默认 `ModelSelection`，让直接入口与 Host 支撑的 Agent 入口共享同一个状态所有者。 |
 | `ctx.hxa` | `seam` | [`hxa`](../packages/hxa/hxa) | - | [`tool-hxa`](../packages/hxa/tool-hxa), [`hxa-inbound`](../packages/hxa/hxa-inbound) | - | 一个 hub 上的一个 bot 身份：端点/凭据解析与带鉴权的请求通路，供团队工具与入站桥消费。 |
 | `ctx.weixin` | `seam` | [`weixin`](../packages/weixin/weixin) | - | [`weixin-agent`](../packages/weixin/weixin-agent), [`web-app`](../packages/bundle/web-app) | - | 绑定、持久凭据、派发 weixin/message 的接收循环与出站文本；weixin-agent 承担对话桥接。 |
-| `ctx.visionBridge` | `core` | [`vision-bridge`](../packages/llm/vision-bridge) | - | [`host-apiproxy`](../packages/host/apiproxy) | - | 通过配置的多模态路由转述已记录图片来修复 UNSUPPORTED_CONTENT 步骤；宿主据此在纯文本路由上放行图片。 |
 | `ctx.agentLoop` | `bundle` | [`agent-loop`](../packages/core/agent-loop) | - | [`agent-spine-demo`](../packages/examples/agent-spine-demo) | - | 唯一的具体循环插件；扩展包依赖 dsh-agent 的事件和服务，而不依赖此包。 |
 | `ctx.goals` | `core` | [`goal`](../packages/goal/goal) | - | - | - | 从会话日志折叠带修订版本的目标状态，并将实时延续激活保留在进程本地。 |
 | `ctx.e2b` | `core` | [`e2b`](../packages/e2b/e2b) | - | [`fs-e2b`](../packages/e2b/fs-e2b), [`subprocess-e2b`](../packages/e2b/subprocess-e2b) | - | 拥有一个共享的 E2B SDK 句柄、远程工作目录和最终沙箱处置，使两个基础 E2B 提供方处于同一个 Linux 运行时中。 |
