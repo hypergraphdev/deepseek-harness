@@ -55,6 +55,8 @@ harness 由 `packages/` 下的 npm 包组装而成，按能力系列分组：会
 | [`jobs/`](jobs/README.zh.md) | 通用后台任务运行时和面向模型的作业控制工具 |
 | [`experimental/`](experimental/README.zh.md) | 仍在评估中的能力；[状态与支持策略](experimental/README.zh.md#status) |
 | [`workflow/`](workflow/README.zh.md) | 工作流 seam、PTC 进程引擎、面向模型的 `workflow` 工具 |
+| [`hxa/`](hxa/README.zh.md) | HXA Connect hub 成员身份与面向模型的团队工具 |
+| [`weixin/`](weixin/README.zh.md) | 单个扫码绑定的微信账号及其 agent 桥接 |
 | [`web/`](web/README.zh.md) | Web 能力系列：seam、搜索／获取提供方、面向模型的 Web 工具 |
 | [`document/`](document/README.zh.md) | 共享宿主 Office 到 PDF 转换 |
 | [`attachment/`](attachment/README.zh.md) | 持久附件标识、校验、本地内容寻址存储 |

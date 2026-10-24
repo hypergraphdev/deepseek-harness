@@ -174,6 +174,16 @@ flowchart LR
   cfg --> plugin_dsh_base_tool_goal
   plugin_dsh_base_repeat_tool_reminder["repeat-tool-reminder<br/>@deepseek-ai/dsh-repeat-tool-reminder"]
   cfg --> plugin_dsh_base_repeat_tool_reminder
+  plugin_dsh_base_hxa["hxa<br/>@deepseek-ai/dsh-hxa"]
+  cfg --> plugin_dsh_base_hxa
+  plugin_dsh_base_tool_hxa["tool-hxa<br/>@deepseek-ai/dsh-tool-hxa"]
+  cfg --> plugin_dsh_base_tool_hxa
+  plugin_dsh_base_hxa_inbound["hxa-inbound<br/>@deepseek-ai/dsh-hxa-inbound"]
+  cfg --> plugin_dsh_base_hxa_inbound
+  plugin_dsh_base_weixin["weixin<br/>@deepseek-ai/dsh-weixin"]
+  cfg --> plugin_dsh_base_weixin
+  plugin_dsh_base_weixin_agent["weixin-agent<br/>@deepseek-ai/dsh-weixin-agent"]
+  cfg --> plugin_dsh_base_weixin_agent
   plugin_dsh_base_web["web<br/>@deepseek-ai/dsh-web"]
   cfg --> plugin_dsh_base_web
   plugin_dsh_base_web_search_deepseek["web-search-deepseek<br/>@deepseek-ai/dsh-web-search-deepseek"]
@@ -289,6 +299,11 @@ flowchart LR
 | `tool-todo` | `@deepseek-ai/dsh-tool-todo` |
 | `tool-goal` | `@deepseek-ai/dsh-tool-goal` |
 | `repeat-tool-reminder` | `@deepseek-ai/dsh-repeat-tool-reminder` |
+| `hxa` | `@deepseek-ai/dsh-hxa` |
+| `tool-hxa` | `@deepseek-ai/dsh-tool-hxa` |
+| `hxa-inbound` | `@deepseek-ai/dsh-hxa-inbound` |
+| `weixin` | `@deepseek-ai/dsh-weixin` |
+| `weixin-agent` | `@deepseek-ai/dsh-weixin-agent` |
 | `web` | `@deepseek-ai/dsh-web` |
 | `web-search-deepseek` | `@deepseek-ai/dsh-web-search-deepseek` |
 | `web-deepseek-api` | `@deepseek-ai/dsh-web-deepseek-api` |

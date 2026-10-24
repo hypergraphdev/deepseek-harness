@@ -67,6 +67,20 @@ export async function runCli(options: RunCliOptions = {}): Promise<void> {
       await runDumpConfigSchema(invocation.profile, invocation.patches, invocation.fromDefaultProfile)
       break
     }
+    case 'browser-host': {
+      const { runBrowserHost } = await import('./browser-host.ts')
+      await runBrowserHost({ port: invocation.port })
+      break
+    }
+    case 'install-browser-host': {
+      const { runInstallBrowserHost } = await import('./install-browser-host.ts')
+      process.exit(runInstallBrowserHost({
+        extension: invocation.extension,
+        browsers: invocation.browsers,
+        port: invocation.port,
+      }))
+      break
+    }
     default:
       invocation satisfies never
       throw new Error(`dsh: unhandled invocation mode ${JSON.stringify(invocation)}`)

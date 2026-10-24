@@ -46,4 +46,9 @@ apps/web/dist/
 worktrees/
 .agents/worktrees/
 .typert-*/
+nohup.out
+
+# User-owned extension site adapters (see site-adapters.example.json)
+apps/extension/site-adapters.json
+
 native/system/test/bin/

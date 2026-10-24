@@ -1,0 +1,19 @@
+# Bilingual-pair consistency record for 2026-08-15-browser-extension-native-host.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-15-browser-extension-native-host.md
+/agent-note-browser-extension-through-a-native-messaging-launcher:
+  en: d5e31a5b73263059
+  zh: c211225f87c6db19
+/agent-note-browser-extension-through-a-native-messaging-launcher/problem:
+  en: 290d9d22d789bd1b
+  zh: 9bffe251c866b6f2
+/agent-note-browser-extension-through-a-native-messaging-launcher/decision:
+  en: 239a41bbc73770eb
+  zh: b9f2a0406bd1945c
+/agent-note-browser-extension-through-a-native-messaging-launcher/consequences:
+  en: 18c9fd385ac95814
+  zh: 4374fb07237779bc
+/agent-note-browser-extension-through-a-native-messaging-launcher/alternatives-considered:
+  en: 72eb921e4ceb9c71
+  zh: 2594fda13336f718

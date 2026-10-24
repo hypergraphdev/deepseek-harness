@@ -666,6 +666,22 @@ const SERVICE_ROLES: ServiceRole[] = [
     note: 'Reads the default ModelSelection from volatile Config and saves selections through the profile editor.',
   },
   {
+    key: 'hxa',
+    pkg: 'hxa',
+    title: 'HXA Connect hub membership',
+    mode: 'seam',
+    consumers: ['tool-hxa', 'hxa-inbound'],
+    note: 'One bot identity on one hub: endpoint/credential resolution and the authenticated request path the team tools and inbound bridge consume.',
+  },
+  {
+    key: 'weixin',
+    pkg: 'weixin',
+    title: 'QR-linked WeChat account',
+    mode: 'seam',
+    consumers: ['weixin-agent', 'web-app'],
+    note: 'Linking, the durable credential, the receive loop dispatching weixin/message, and outbound text; weixin-agent bridges the conversation.',
+  },
+  {
     key: 'agentLoop',
     pkg: 'agent-loop',
     title: 'Concrete loop driver',

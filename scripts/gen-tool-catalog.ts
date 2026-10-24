@@ -73,6 +73,8 @@ import * as StagehandBrowserTools from '@deepseek-ai/dsh-experimental-browser-us
 import type TeamService from '@deepseek-ai/dsh-experimental-agent-team'
 import * as ToolTeam from '@deepseek-ai/dsh-experimental-tool-agent-team'
 import * as ToolTodo from '@deepseek-ai/dsh-tool-todo'
+import HxaRuntime from '@deepseek-ai/dsh-hxa'
+import * as ToolHxa from '@deepseek-ai/dsh-tool-hxa'
 import type PluginManager from '@deepseek-ai/dsh-plugin-manager'
 import * as PluginManagerTools from '@deepseek-ai/dsh-plugin-manager/tools'
 import type PluginMarket from '@deepseek-ai/dsh-plugin-market'
@@ -639,6 +641,22 @@ const TOOL_PACKAGES: ToolPackage[] = [
     scope: ctx => catalogChildScopes.get(ctx) as Agent,
     note:
       'All nine tools are scoped to implicit Team Leads and durable teammates. The shipped dsh-base bundle keeps the package disabled; the documented Agent Teams profile patch enables it while disabling the legacy continuable-child control names.',
+  },
+  {
+    pkg: '@deepseek-ai/dsh-tool-hxa',
+    dir: 'tool-hxa',
+    source: 'packages/hxa/tool-hxa/src/index.ts',
+    requires: ['ctx.hxa with a live endpoint', 'ctx.tools', 'ctx.systemPrompt'],
+    writes: ['tool/call', 'tool/result'],
+    async mount(ctx) {
+      // The tools register only while a live endpoint exists; a scratch route
+      // and token satisfy that gate without reaching any hub.
+      process.env['HXA_BOT_TOKEN'] = 'catalog-scratch-token'
+      await ctx.plugin(HxaRuntime, { url: 'https://hxa.invalid/connect' })
+      await ctx.plugin(ToolHxa, {})
+    },
+    note:
+      'The team tools register together while the hub endpoint is configured and the bot token variable is set; a dormant hub advertises nothing. hxa_inbox expansion is bounded by the plugin config.',
   },
   {
     pkg: '@deepseek-ai/dsh-tool-todo',

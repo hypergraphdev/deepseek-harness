@@ -57,6 +57,7 @@ Examples:
   dsh tui --resume <session>                arguments after the launcher flags reach the app
   dsh web --help                            the web app's own flags and help
   dsh plugin --profile tui add <package>    install a plugin into the tui profile
+  dsh install-browser-host --extension <id>  let the browser extension launch dsh web
 
 ```
 

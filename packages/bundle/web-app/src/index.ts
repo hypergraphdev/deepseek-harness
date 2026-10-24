@@ -26,6 +26,9 @@ import { scrubbedParentEnv } from '@deepseek-ai/dsh-subprocess'
 import type {} from '@deepseek-ai/cordis-plugin-loader'
 import type {} from '@deepseek-ai/dsh-shell-env'
 import { parsePublicUrl } from './public-url.ts'
+import { installBrowserPageContext } from './browser-page.ts'
+import { installHxaRoster } from './hxa-roster.ts'
+import { installWeixinLink } from './weixin-link.ts'
 
 /** The Web GUI this process serves, provided by the `web-runtime` row. */
 export interface WebApp {
@@ -204,7 +207,15 @@ export function apply(ctx: Context, config: Config): void {
   const appRootUrl = (): string => publicUrl ?? ctx.webServer.getOrigin()
   ctx.provide('webApp', { getAdvertisedUrl: appRootUrl } satisfies WebApp)
   ctx.plugin(FrontendStatic, { distIndex: internals.resolveDistIndex() })
+  // Roster and WeChat link routes serve the client panels. Each stays dormant
+  // until its own service is configured, so they do not depend on surfaceContext.
+  installHxaRoster(ctx)
+  installWeixinLink(ctx)
   if (config.surfaceContext) {
+    // The extension panel's active tab reaches the model as request context.
+    ctx.inject(['agents'], (agentCtx) => {
+      installBrowserPageContext(agentCtx)
+    })
     ctx.inject(['shellEnv'], (runtimeCtx) => {
       runtimeCtx.shellEnv.register({
         name: 'web-runtime',

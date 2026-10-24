@@ -40,7 +40,8 @@ const HARNESS_SOURCE_GUIDANCE = 'The checkout location and current working direc
 const HARNESS_SOURCE_PROMPT = `The runtime context names the DeepSeek Harness implementation checkout. ${HARNESS_SOURCE_GUIDANCE}`
 
 const WEB_SURFACE_GUIDANCE = 'When the user refers to "this page", "this GUI", or "this app" without naming another target, they mean this GUI. '
-  + 'The browser provides no implicit DOM, route, or screenshot context. '
+  + 'Aside from active-browser-tab snapshot messages provided when the GUI is embedded in the dsh browser extension panel, '
+  + 'the browser provides no implicit DOM, route, or screenshot context. '
   + 'The client-plugin HMR receiver is active, but client-plugin changes reload without a refresh only while '
   + '`pnpm run dev:web` is also running from this same checkout to rebuild their bundles; verify that watcher before promising automatic updates. '
   + 'Every other change — the apps/web shell and plain packages — requires rebuilding the affected Web artifacts and verifying this existing URL after a page refresh. '

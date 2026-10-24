@@ -9,8 +9,8 @@
   en: 6cc2cd9ced70bb09
   zh: 1c0e6cb4ba2ed637
 /tool-schema-catalog/tool-package-map:
-  en: 4d42222acd39d083
-  zh: 8153a5065bf2ebd6
+  en: 0facb977410b6139
+  zh: e3019350b50d461d
 /tool-schema-catalog/deepseek-ai-dsh-plugin-manager:
   en: e0143916bb634762
   zh: e0143916bb634762
@@ -300,8 +300,20 @@
   en: 2eac7360ba68b1bd
   zh: b5d676bf288c245e
 /tool-schema-catalog/deepseek-ai-dsh-experimental-tool-agent-team/wait-agent:
-  en: e70c77a45832bb28
-  zh: 7d03bec294b65452
+  en: b6edb95da3418938
+  zh: 718eb95f4c8fa9dd
+/tool-schema-catalog/deepseek-ai-dsh-tool-hxa:
+  en: eb2a4eb31b205dde
+  zh: eb2a4eb31b205dde
+/tool-schema-catalog/deepseek-ai-dsh-tool-hxa/hxa-contacts:
+  en: 9c9ba0d31be7c44b
+  zh: 9c9ba0d31be7c44b
+/tool-schema-catalog/deepseek-ai-dsh-tool-hxa/hxa-inbox:
+  en: 249244184cf798a9
+  zh: 249244184cf798a9
+/tool-schema-catalog/deepseek-ai-dsh-tool-hxa/hxa-send:
+  en: d9d85fd19d128b44
+  zh: d9d85fd19d128b44
 /tool-schema-catalog/deepseek-ai-dsh-tool-todo:
   en: dea62d26fb18ff68
   zh: dea62d26fb18ff68

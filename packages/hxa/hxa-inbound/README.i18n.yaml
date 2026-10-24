@@ -1,0 +1,58 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/hxa/hxa-inbound/README.md
+/:
+  en: 6c32b35167478d11
+  zh: 1839d13e980964ab
+/deepseek-ai-dsh-hxa-inbound:
+  en: 90662505e05452a0
+  zh: 5b775fa6151402cb
+/deepseek-ai-dsh-hxa-inbound/summary:
+  en: 478e325c242248df
+  zh: 165e03a4b3abfb93
+/deepseek-ai-dsh-hxa-inbound/table-of-contents:
+  en: 3a654e12f423946b
+  zh: 56d8e3fc4c1b5baa
+/deepseek-ai-dsh-hxa-inbound/use-this-package:
+  en: 7cdad05e8cf88869
+  zh: b1b1a92c557ff850
+/deepseek-ai-dsh-hxa-inbound/configuration:
+  en: cb17777f2fa367ed
+  zh: c7eba96c798178bd
+/deepseek-ai-dsh-hxa-inbound/model-experience:
+  en: 215e7ba838619b7b
+  zh: 215e7ba838619b7b
+/deepseek-ai-dsh-hxa-inbound/model-experience/coordinator-persona:
+  en: a453359f137c2d18
+  zh: cf76ca2ed0ad7f87
+/deepseek-ai-dsh-hxa-inbound/model-experience/coordinator-persona/what-the-model-sees:
+  en: c6ebfcb2de9fdf0d
+  zh: c6e4becb5ece52ad
+/deepseek-ai-dsh-hxa-inbound/model-experience/coordinator-persona/what-the-model-sees/section-text:
+  en: 0f7724bcd908c288
+  zh: 0f7724bcd908c288
+/deepseek-ai-dsh-hxa-inbound/model-experience/coordinator-persona/token-effect:
+  en: 444c126ee5c0c046
+  zh: d915abfbcb297db7
+/deepseek-ai-dsh-hxa-inbound/model-experience/coordinator-persona/kv-cache-effect:
+  en: 609c3ae6bba147af
+  zh: cf2a75875a479180
+/deepseek-ai-dsh-hxa-inbound/model-experience/inbound-notice-messages:
+  en: a09eecd76af5bb9d
+  zh: dfb629bafde01416
+/deepseek-ai-dsh-hxa-inbound/model-experience/inbound-notice-messages/what-the-model-sees:
+  en: da29f51905375080
+  zh: 35c2df4b06f4773d
+/deepseek-ai-dsh-hxa-inbound/model-experience/inbound-notice-messages/token-effect:
+  en: 86607245855f0fed
+  zh: 8e8c21f04fb2b290
+/deepseek-ai-dsh-hxa-inbound/model-experience/inbound-notice-messages/kv-cache-effect:
+  en: f5d5f97a153f7c70
+  zh: 66eb93ec3cd3a121
+/deepseek-ai-dsh-hxa-inbound/known-limitations-and-deferred-work:
+  en: 70823f402700df49
+  zh: 371f5937c3919aed
+/deepseek-ai-dsh-hxa-inbound/known-limitations-and-deferred-work/dev-note:
+  en: 3a9425f23f867926
+  zh: 132f23a751e39abe

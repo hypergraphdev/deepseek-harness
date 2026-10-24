@@ -457,6 +457,12 @@
     - id: ui-plan
       name: '@deepseek-ai/dsh-client-ui-plan'
 
+    - id: ui-agents
+      name: '@deepseek-ai/dsh-client-ui-agents'
+
+    - id: ui-settings-weixin
+      name: '@deepseek-ai/dsh-client-ui-settings-weixin'
+
     - id: ui-user-questions
       name: '@deepseek-ai/dsh-client-ui-user-questions'
 

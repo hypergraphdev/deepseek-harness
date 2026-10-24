@@ -1,0 +1,19 @@
+# Bilingual-pair consistency record for 2026-10-24-extension-edition-composed-over-upstream.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write .agents/notes/implemented/architecture/2026-10-24-extension-edition-composed-over-upstream.md
+/agent-note-extension-edition-composed-over-the-upstream-tip:
+  en: ece868cf1dc96507
+  zh: 4b9a7d78b2bb90f5
+/agent-note-extension-edition-composed-over-the-upstream-tip/problem:
+  en: f3c879015658fa9b
+  zh: 86a3e5508393f528
+/agent-note-extension-edition-composed-over-the-upstream-tip/decision:
+  en: 10e768f885e9d8ae
+  zh: a45611f9579d8f9d
+/agent-note-extension-edition-composed-over-the-upstream-tip/alternatives-considered:
+  en: cceed01597938d00
+  zh: 610910e88922edb8
+/agent-note-extension-edition-composed-over-the-upstream-tip/consequences:
+  en: 0b4fc2786f018a66
+  zh: c1fcc49b07f8b400

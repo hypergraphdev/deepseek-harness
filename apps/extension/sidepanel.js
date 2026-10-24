@@ -1,0 +1,202 @@
+// Side panel bootstrap: dial the native-messaging host, ask it to ensure a
+// dsh web server, then hand the whole panel to the served app in an iframe.
+// The iframe stays same-origin with the server, so the app's own RPC and
+// WebSocket connections pass the server's browser trust fence untouched.
+
+const NATIVE_HOST_NAME = 'ai.deepseek.dsh'
+
+const statusPane = document.getElementById('status')
+const appFrame = document.getElementById('app')
+const captureButton = document.getElementById('capture')
+
+function showStatus(html) {
+  statusPane.innerHTML = html
+  statusPane.classList.remove('hidden')
+  appFrame.style.display = 'none'
+  captureButton.style.display = 'none'
+}
+
+// Origin the app was handed to; page reports target exactly this origin.
+let appOrigin
+
+function showApp(url) {
+  appOrigin = new URL(url).origin
+  appFrame.src = url
+  appFrame.style.display = 'block'
+  captureButton.style.display = 'block'
+  statusPane.classList.add('hidden')
+}
+
+// Report the active tab of the panel's window into the embedded app, which
+// attaches the newest report to the next prompt. Every change reports: the
+// app classifies web and file pages as pages and anything else (chrome://,
+// about:) as "no active page", so a closed page never lingers as stale
+// context.
+async function reportActivePage() {
+  if (appOrigin === undefined || appFrame.contentWindow === null) return
+  let tab
+  try {
+    // The panel's own window, not lastFocusedWindow: focus may sit on a
+    // DevTools or unrelated window whose "window" has no tabs at all.
+    const panelWindow = await chrome.windows.getCurrent()
+    ;[tab] = await chrome.tabs.query({ active: true, windowId: panelWindow.id })
+  } catch {
+    return
+  }
+  if (tab === undefined || typeof tab.url !== 'string') return
+  appFrame.contentWindow.postMessage(
+    { type: 'dsh:browser-page', url: tab.url, title: typeof tab.title === 'string' ? tab.title : '' },
+    appOrigin,
+  )
+}
+
+chrome.tabs.onActivated.addListener(() => { reportActivePage() })
+chrome.tabs.onUpdated.addListener((_tabId, changeInfo, tab) => {
+  if (tab.active && (changeInfo.url !== undefined || changeInfo.title !== undefined || changeInfo.status === 'complete')) {
+    reportActivePage()
+  }
+})
+// Post one message into the embedded app at its exact origin.
+function postToApp(message) {
+  if (appOrigin === undefined || appFrame.contentWindow === null) return
+  appFrame.contentWindow.postMessage(message, appOrigin)
+}
+
+// ---- Page capture ----
+// The extraction itself lives in page-extract.js, injected into the tab; the
+// panel only decides when to run it and where the result goes.
+
+/** Cap on the extracted body: a whole prompt turn, not a whole book. */
+const CAPTURE_MAX_CHARS = 20000
+
+/**
+ * The user's site adapters, from `site-adapters.json` beside this file.
+ * Absent (the shipped state) means no site knowledge at all — see
+ * site-adapters.example.json for the format.
+ */
+async function loadSiteAdapters() {
+  try {
+    const response = await fetch(chrome.runtime.getURL('site-adapters.json'))
+    if (!response.ok) return []
+    const parsed = await response.json()
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+async function capturePage() {
+  captureButton.disabled = true
+  const restore = (label) => {
+    captureButton.textContent = label
+    setTimeout(() => { captureButton.textContent = '📄 读取本页'; captureButton.disabled = false }, 2200)
+  }
+  let tab
+  try {
+    const panelWindow = await chrome.windows.getCurrent()
+    ;[tab] = await chrome.tabs.query({ active: true, windowId: panelWindow.id })
+  } catch {
+    restore('读取失败')
+    return
+  }
+  if (tab === undefined || typeof tab.url !== 'string' || !/^https?:\/\//.test(tab.url)) {
+    restore('此页不支持')
+    return
+  }
+  const adapters = await loadSiteAdapters()
+  let results
+  try {
+    // The extractor file first, then one call that uses it: reading mode
+    // always, plus whichever configured adapter matches this host.
+    await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['page-extract.js'] })
+    results = await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      args: [adapters],
+      func: async (configured) => ({ page: readPage(), site: await readSiteData(configured) }),
+    })
+  } catch {
+    // Chrome refuses injection on its own pages, the store, and PDF viewers.
+    restore('此页不可读')
+    return
+  }
+  const captured = results?.[0]?.result
+  const page = captured?.page
+  if (page === undefined || (page.markdown.length === 0 && page.selection.length === 0)) {
+    restore('无正文')
+    return
+  }
+  const body = page.markdown.length > CAPTURE_MAX_CHARS
+    ? `${page.markdown.slice(0, CAPTURE_MAX_CHARS)}\n\n[内容过长，已截断]`
+    : page.markdown
+  postToApp({
+    type: 'dsh:page-capture',
+    url: page.url,
+    title: page.title,
+    selection: page.selection,
+    text: body,
+    ...(captured.site === undefined ? {} : { site: captured.site }),
+  })
+  restore(captured.site === undefined ? '✓ 已发送' : '✓ 已发送(含数据)')
+}
+
+captureButton.addEventListener('click', () => { void capturePage() })
+
+// The app announces its listener after boot; the load-time report below can
+// fire before that listener exists, so the handshake re-reports.
+window.addEventListener('message', (event) => {
+  if (event.source !== appFrame.contentWindow
+    || event.data === null || typeof event.data !== 'object') return
+  if (event.data.type === 'dsh:browser-page-ready') reportActivePage()
+})
+appFrame.addEventListener('load', () => { reportActivePage() })
+
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"']/g, character => `&#${character.charCodeAt(0)};`)
+}
+
+function showOnboarding(detail) {
+  showStatus(`
+    <h1>Connect this panel to dsh</h1>
+    <ol>
+      <li>Install the CLI once: <code>npm i -g dsh</code></li>
+      <li>Register this extension: <code>dsh install-browser-host --extension ${chrome.runtime.id}</code></li>
+      <li>Reopen this panel.</li>
+    </ol>
+    <button id="retry">Retry</button>
+    ${detail === undefined ? '' : `<div class="detail">${escapeHtml(detail)}</div>`}
+  `)
+  document.getElementById('retry').addEventListener('click', connect)
+}
+
+function connect() {
+  showStatus('Connecting to dsh…')
+  let port
+  try {
+    port = chrome.runtime.connectNative(NATIVE_HOST_NAME)
+  } catch (error) {
+    showOnboarding(error instanceof Error ? error.message : String(error))
+    return
+  }
+  let settled = false
+  port.onMessage.addListener((message) => {
+    if (settled || message === null || typeof message !== 'object') return
+    if (message.type === 'ready' && typeof message.url === 'string') {
+      settled = true
+      showApp(message.url)
+      port.disconnect()
+    } else if (message.type === 'error') {
+      settled = true
+      showOnboarding(message.message)
+      port.disconnect()
+    }
+  })
+  port.onDisconnect.addListener(() => {
+    if (settled) return
+    settled = true
+    showOnboarding(chrome.runtime.lastError === undefined ? undefined : chrome.runtime.lastError.message)
+  })
+  showStatus('Starting the dsh web server… (first start can take a minute)')
+  port.postMessage({ type: 'ensure' })
+}
+
+connect()

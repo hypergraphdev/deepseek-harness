@@ -1,0 +1,58 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/weixin/weixin-agent/README.md
+/:
+  en: 44e944b00dddc734
+  zh: ba7ceb371f647165
+/deepseek-ai-dsh-weixin-agent:
+  en: cfbfa7c50ab1ba75
+  zh: dd59ba5373974b91
+/deepseek-ai-dsh-weixin-agent/summary:
+  en: d1bd7757c15ede40
+  zh: 88b79af7e77fdcc6
+/deepseek-ai-dsh-weixin-agent/table-of-contents:
+  en: 3a654e12f423946b
+  zh: 56d8e3fc4c1b5baa
+/deepseek-ai-dsh-weixin-agent/use-this-package:
+  en: 4dd5f08bb05fd82c
+  zh: 2969fb2b38b8a138
+/deepseek-ai-dsh-weixin-agent/configuration:
+  en: 2db6dd4885408630
+  zh: 96f96a81004c0dcd
+/deepseek-ai-dsh-weixin-agent/model-experience:
+  en: 215e7ba838619b7b
+  zh: 215e7ba838619b7b
+/deepseek-ai-dsh-weixin-agent/model-experience/chat-persona:
+  en: 617c834925501dd5
+  zh: 7f65854a74374d65
+/deepseek-ai-dsh-weixin-agent/model-experience/chat-persona/what-the-model-sees:
+  en: b8574092bcef5207
+  zh: 008d8c560be7686f
+/deepseek-ai-dsh-weixin-agent/model-experience/chat-persona/what-the-model-sees/section-text:
+  en: 0f7724bcd908c288
+  zh: 0f7724bcd908c288
+/deepseek-ai-dsh-weixin-agent/model-experience/chat-persona/token-effect:
+  en: b6a8a085038e77cc
+  zh: 0b526e6b332175ed
+/deepseek-ai-dsh-weixin-agent/model-experience/chat-persona/kv-cache-effect:
+  en: 71dea1e1c8319043
+  zh: 7005c93803c59653
+/deepseek-ai-dsh-weixin-agent/model-experience/inbound-notices-and-the-reply-path:
+  en: 15b2dccf76a0ee69
+  zh: 205f0890500959ff
+/deepseek-ai-dsh-weixin-agent/model-experience/inbound-notices-and-the-reply-path/what-the-model-sees:
+  en: 80f741a37e4a6276
+  zh: 9859b7976ae7e3b2
+/deepseek-ai-dsh-weixin-agent/model-experience/inbound-notices-and-the-reply-path/token-effect:
+  en: 7ddaf4cd44f751f3
+  zh: c0e105f59abe0c46
+/deepseek-ai-dsh-weixin-agent/model-experience/inbound-notices-and-the-reply-path/kv-cache-effect:
+  en: f5d5f97a153f7c70
+  zh: 66eb93ec3cd3a121
+/deepseek-ai-dsh-weixin-agent/known-limitations-and-deferred-work:
+  en: 220572508fd051a7
+  zh: 9380e588139cc09f
+/deepseek-ai-dsh-weixin-agent/known-limitations-and-deferred-work/dev-note:
+  en: 3a9425f23f867926
+  zh: 132f23a751e39abe

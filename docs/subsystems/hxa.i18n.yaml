@@ -1,0 +1,7 @@
+# Bilingual-pair consistency record for hxa.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write docs/subsystems/hxa.md
+/hxa-connect:
+  en: ddbdd71d66067ae5
+  zh: cc377cbf5a5486ab

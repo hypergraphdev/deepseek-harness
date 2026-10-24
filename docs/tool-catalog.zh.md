@@ -48,6 +48,7 @@
 | `@deepseek-ai/dsh-tool-subagent-control` | `interrupt_agent`、`list_agents`、`send_message` | `ctx.tools`、`ctx.subagents`、`ctx.agents` | `tool/call`、`tool/result`、`child session events through ctx.subagents` | - | 这些是用于发现、中断托管 subagent 和向本地子代理发送消息的全局命名工具：绑定提供方的 `tool-subagent` 实例注册不同的委派工具；本包的一个实例注册 `send_message`、`interrupt_agent` 和 `list_agents`。 |
 | `@deepseek-ai/dsh-tool-jobs` | `job_kill`、`job_list`、`job_output` | `ctx.tools`、`ctx.jobs`、`ctx.systemPrompt` | `tool/call`、`tool/result`、`user/message via agent.inject() for background completion notices` | - | 与任务种类无关的后台任务控制器：后台 bash 命令与 PTY 发送 都通过相同的 3 个工具读取、列出和终止。加载该插件会挂接控制器，从而启用生产方的 `ctx.jobs.start()`。 |
 | `@deepseek-ai/dsh-experimental-tool-agent-team` | `interrupt_agent`、`list_agents`、`send_message`、`spawn_teammate`、`team_task_create`、`team_task_get`、`team_task_list`、`team_task_update`、`wait_agent` | `ctx.tools`、`ctx.systemPrompt`、`ctx.agentTeams`、`an exact live Team member Agent` | `tool/call`、`team/member`、`team/task`、`agent/inbox/spliced`、`user/message on inbox claim`、`tool/result` | - | 这 9 个工具限定于隐式 Team Lead 与持久 teammate 作用域。随产品发布的 dsh-base bundle 默认禁用该包；文档中的 Agent Teams profile patch 会启用它，并禁用旧 continuable child 的同名控制工具。 |
+| `@deepseek-ai/dsh-tool-hxa` | `hxa_contacts`、`hxa_inbox`、`hxa_send` | `ctx.hxa with a live endpoint`、`ctx.tools`、`ctx.systemPrompt` | `tool/call`、`tool/result` | - | 团队工具在 hub 端点已配置且 bot token 环境变量已设置时一并注册；休眠的 hub 不公布任何工具。hxa_inbox 的展开量受插件配置约束。 |
 | `@deepseek-ai/dsh-tool-todo` | `todo_write` | `ctx.tools`、`owning Agent session` | `tool/call`、`todo/write`、`tool/result` | - | todo_write 是会话所有的状态；UI 将最新的 todo/write 事件渲染为检查清单。`allowParallelInProgress` 是没有默认值的必填项，因此本目录明确选择 `true`，对应描述允许同时存在多个 `in_progress` 项。选择 `false` 的部署会获得同一工具，但描述会要求只能有 1 个活动任务。 |
 | `@deepseek-ai/dsh-tool-working-directory` | `working_directory` | `ctx.tools`, `ctx.workingDirectory` | `tool/call`, `working-directory/change`, `user context for directory changes`, `tool/result` | - | 读取或改变调用方 Session 的目录。已有 shell 和进程保留自己的目录；原始元数据和权限根目录保持不变。 |
 | `@deepseek-ai/dsh-experimental-tool-worktree` | `create_worktree` | `ctx.tools`, `ctx.worktrees`, `a calling Agent` | `tool/call`, `Git branch and checkout`, `working-directory/change`, `tool/result` | - | 仅通过显式实验组合加载。在现有写权限下从固定的本地提交创建新分支与检出目录，再改变 Session 工作目录。离开时保留分支与检出目录。 |
@@ -2654,6 +2655,74 @@ subagent_oar 工具在为外部提供方配置的别名之间选择。本目录�
 
 这 10 个工具限定于隐式 Team Lead 与持久 teammate 作用域。随产品发布的 dsh-base bundle 默认禁用该包；文档中的 Agent Teams profile patch 会启用它，并禁用旧 continuable child 的同名控制工具。
 
+
+<a id="deepseek-aidsh-tool-hxa"></a>
+
+## `@deepseek-ai/dsh-tool-hxa`
+
+### `hxa_contacts`
+
+List the teammates (bots) in your HXA org: name, role, bio, and online state. Optional fuzzy query over role/bio.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "query": {
+      "type": "string",
+      "description": "Fuzzy filter over bio/role/function; omit to list everyone."
+    }
+  }
+}
+```
+
+Source: [`packages/hxa/tool-hxa/src/index.ts`](../packages/hxa/tool-hxa/src/index.ts)
+
+### `hxa_inbox`
+
+Collect HXA events since the last check: unread DM messages (expanded per channel) and thread invitations/status changes.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "since_hours": {
+      "type": "number",
+      "description": "Look-back window in hours; omit to resume from the previous check."
+    }
+  }
+}
+```
+
+Source: [`packages/hxa/tool-hxa/src/index.ts`](../packages/hxa/tool-hxa/src/index.ts)
+
+### `hxa_send`
+
+Send a direct message to one HXA teammate by bot name. Replies arrive asynchronously; collect them later with hxa_inbox.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "to": {
+      "type": "string",
+      "description": "Target bot name (see hxa_contacts)."
+    },
+    "content": {
+      "type": "string",
+      "description": "The message body."
+    }
+  },
+  "required": [
+    "to",
+    "content"
+  ]
+}
+```
+
+Source: [`packages/hxa/tool-hxa/src/index.ts`](../packages/hxa/tool-hxa/src/index.ts)
+
+The team tools register together while the hub endpoint is configured and the bot token variable is set; a dormant hub advertises nothing. hxa_inbox expansion is bounded by the plugin config.
 
 <a id="deepseek-aidsh-tool-todo"></a>
 

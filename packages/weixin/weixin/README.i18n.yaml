@@ -1,0 +1,31 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/weixin/weixin/README.md
+/:
+  en: 111afcd1fa8f84c4
+  zh: 96243f955a0ff7f2
+/deepseek-ai-dsh-weixin:
+  en: 25e2f47e7bd192bd
+  zh: d0c0ccf29e573aa5
+/deepseek-ai-dsh-weixin/summary:
+  en: b91e4dfcab81c301
+  zh: a90f89b55a854619
+/deepseek-ai-dsh-weixin/table-of-contents:
+  en: f655f2e399ab5001
+  zh: 60146a38139b7bcd
+/deepseek-ai-dsh-weixin/configuration:
+  en: 845f92d1badd772d
+  zh: 2bf9f14f502077d4
+/deepseek-ai-dsh-weixin/model-experience:
+  en: ef997becba0db4ff
+  zh: e087c0bbfa49e73f
+/deepseek-ai-dsh-weixin/model-experience/kv-cache-effect:
+  en: 8c7ac7bd7d7a12bb
+  zh: 3710cbc57ef02abe
+/deepseek-ai-dsh-weixin/known-limitations-and-deferred-work:
+  en: daa0d02ab39e300d
+  zh: 348e3f8841565738
+/deepseek-ai-dsh-weixin/known-limitations-and-deferred-work/dev-note:
+  en: fa1bf4a366bafae1
+  zh: 53701d095405b8e2

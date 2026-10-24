@@ -447,6 +447,27 @@
         thresholds: [3, 5, 8]
         argumentsPreviewChars: 500
 
+    # HXA Connect membership: dormant until a hub url is configured here (or
+    # via a user patch) and the bot token environment variable is set.
+    - id: hxa
+      name: '@deepseek-ai/dsh-hxa'
+
+    - id: tool-hxa
+      name: '@deepseek-ai/dsh-tool-hxa'
+
+    # Inbound bridge: while the hub is configured, one WebSocket keeps the bot
+    # online and wakes a coordinator agent per inbound DM. Dormant otherwise.
+    - id: hxa-inbound
+      name: '@deepseek-ai/dsh-hxa-inbound'
+
+    # WeChat: dormant until a QR scan stores a credential under the harness
+    # home; the agent bridge answers inbound messages once one exists.
+    - id: weixin
+      name: '@deepseek-ai/dsh-weixin'
+
+    - id: weixin-agent
+      name: '@deepseek-ai/dsh-weixin-agent'
+
     # The shared base enables the stable model-facing web_search and web_fetch
     # tools. The Web app disables this host row and composes both tools per agent
     # preset; products with a stricter network policy override tool-web. DeepSeek

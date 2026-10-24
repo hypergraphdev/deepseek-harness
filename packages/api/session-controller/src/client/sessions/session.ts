@@ -1,6 +1,7 @@
 // Sessions remain resident after creation so their open Remote sources keep running off-screen.
 
 import type { Context } from '@deepseek-ai/cordis'
+import { currentBrowserPage, takePageCapture } from '../browser-page.ts'
 import type { InboxState, InboxTarget } from '@deepseek-ai/dsh-agent/types'
 import { randomUUID } from '@deepseek-ai/dsh-util-crypto'
 import type { AttachmentIdType, FileAttachmentRef, ImageAttachmentRef } from '@deepseek-ai/dsh-attachment'
@@ -268,12 +269,18 @@ export class Session implements SessionFace {
     let result: RemoteResult<{ accepted: true }>
     if (this.address === undefined) {
       const clientTimeZone = resolvedClientTimeZone()
+      const browserPage = currentBrowserPage()
+      // A page the user captured rides this prompt as an ordinary text part
+      // ahead of their own words, so it enters the durable message rather
+      // than a side channel.
+      const capture = takePageCapture()
       result = await this.remote.session.prompt({
         requestId: requestId ?? randomUUID() as SessionRequestId,
         sessionId: this.sessionId,
         mode,
-        content,
+        content: capture === undefined ? content : [{ type: 'text', text: capture }, ...content],
         clientTimeZone,
+        ...(browserPage === undefined ? {} : { browserPage }),
       }, signal)
     } else if (content.some(part => part.type === 'file')) {
       result = {

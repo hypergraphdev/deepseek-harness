@@ -55,6 +55,8 @@ Every package lives in exactly one group; new packages join existing groups, and
 | [`jobs/`](jobs/README.md) | Generic background-job runtime and model-facing job control tools |
 | [`experimental/`](experimental/README.md) | Capabilities under evaluation; [status and support policy](experimental/README.md#status) |
 | [`workflow/`](workflow/README.md) | Workflow seam, PTC process engine, and the model-facing `workflow` tool |
+| [`hxa/`](hxa/README.md) | HXA Connect hub membership and the model-facing team tools |
+| [`weixin/`](weixin/README.md) | One QR-linked WeChat account and its agent bridge |
 | [`web/`](web/README.md) | Web capability family: seam, search/fetch providers, model-facing web tools |
 | [`document/`](document/README.md) | Shared Host Office-to-PDF conversion |
 | [`attachment/`](attachment/README.md) | Durable attachment identity, validation, local content-addressed storage |

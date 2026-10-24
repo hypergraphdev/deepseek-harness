@@ -44,6 +44,7 @@ This table connects model-visible tool names to the plugin package and service s
 | `@deepseek-ai/dsh-tool-subagent-control` | `interrupt_agent`, `list_agents`, `send_message` | `ctx.tools`, `ctx.subagents`, `ctx.agents` | `tool/call`, `tool/result`, `child session events through ctx.subagents` | - | The globally named discovery, interruption, and local-message tools over managed subagents: provider-bound `tool-subagent` instances register distinct delegation tools, while one instance of this package registers `send_message`, `interrupt_agent`, and `list_agents`. |
 | `@deepseek-ai/dsh-tool-jobs` | `job_kill`, `job_list`, `job_output` | `ctx.tools`, `ctx.jobs`, `ctx.systemPrompt` | `tool/call`, `tool/result`, `user/message via agent.inject() for background completion notices` | - | The kind-agnostic background-job controller: background bash commands and PTY sends are read, listed, and killed through the same three tools. Loading the plugin attaches the controller that arms producers' `ctx.jobs.start()`. |
 | `@deepseek-ai/dsh-experimental-tool-agent-team` | `interrupt_agent`, `list_agents`, `send_message`, `spawn_teammate`, `team_task_create`, `team_task_get`, `team_task_list`, `team_task_update`, `wait_agent` | `ctx.tools`, `ctx.systemPrompt`, `ctx.agentTeams`, `an exact live Team member Agent` | `tool/call`, `team/member`, `team/task`, `agent/inbox/spliced`, `user/message on inbox claim`, `tool/result` | - | All nine tools are scoped to implicit Team Leads and durable teammates. The shipped dsh-base bundle keeps the package disabled; the documented Agent Teams profile patch enables it while disabling the legacy continuable-child control names. |
+| `@deepseek-ai/dsh-tool-hxa` | `hxa_contacts`, `hxa_inbox`, `hxa_send` | `ctx.hxa with a live endpoint`, `ctx.tools`, `ctx.systemPrompt` | `tool/call`, `tool/result` | - | The team tools register together while the hub endpoint is configured and the bot token variable is set; a dormant hub advertises nothing. hxa_inbox expansion is bounded by the plugin config. |
 | `@deepseek-ai/dsh-tool-todo` | `todo_write` | `ctx.tools`, `owning Agent session` | `tool/call`, `todo/write`, `tool/result` | - | todo_write is session-owned state; UIs render the latest todo/write event as a checklist. `allowParallelInProgress` is required with no default, so the catalog states its choice: `true`, whose description invites several `in_progress` items. A deployment choosing `false` receives the same tool with a description asking for exactly one active task. |
 | `@deepseek-ai/dsh-tool-working-directory` | `working_directory` | `ctx.tools`, `ctx.workingDirectory` | `tool/call`, `working-directory/change`, `user context for directory changes`, `tool/result` | - | Reads or changes the calling Session directory. Existing shells and processes retain their own directories; origin metadata and permission roots stay fixed. |
 | `@deepseek-ai/dsh-experimental-tool-worktree` | `create_worktree` | `ctx.tools`, `ctx.worktrees`, `a calling Agent` | `tool/call`, `Git branch and checkout`, `working-directory/change`, `tool/result` | - | Explicit experimental composition only. Creates a new branch and checkout from a pinned local commit under existing write permissions, then changes the Session directory. Leaving retains the branch and checkout. |
@@ -2647,6 +2648,74 @@ Wait for the next teammate status, message, or shared-task change after this cal
 Source: [`packages/experimental/tool-agent-team/src/index.ts`](../packages/experimental/tool-agent-team/src/index.ts)
 
 All nine tools are scoped to implicit Team Leads and durable teammates. The shipped dsh-base bundle keeps the package disabled; the documented Agent Teams profile patch enables it while disabling the legacy continuable-child control names.
+
+<a id="deepseek-aidsh-tool-hxa"></a>
+
+## `@deepseek-ai/dsh-tool-hxa`
+
+### `hxa_contacts`
+
+List the teammates (bots) in your HXA org: name, role, bio, and online state. Optional fuzzy query over role/bio.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "query": {
+      "type": "string",
+      "description": "Fuzzy filter over bio/role/function; omit to list everyone."
+    }
+  }
+}
+```
+
+Source: [`packages/hxa/tool-hxa/src/index.ts`](../packages/hxa/tool-hxa/src/index.ts)
+
+### `hxa_inbox`
+
+Collect HXA events since the last check: unread DM messages (expanded per channel) and thread invitations/status changes.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "since_hours": {
+      "type": "number",
+      "description": "Look-back window in hours; omit to resume from the previous check."
+    }
+  }
+}
+```
+
+Source: [`packages/hxa/tool-hxa/src/index.ts`](../packages/hxa/tool-hxa/src/index.ts)
+
+### `hxa_send`
+
+Send a direct message to one HXA teammate by bot name. Replies arrive asynchronously; collect them later with hxa_inbox.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "to": {
+      "type": "string",
+      "description": "Target bot name (see hxa_contacts)."
+    },
+    "content": {
+      "type": "string",
+      "description": "The message body."
+    }
+  },
+  "required": [
+    "to",
+    "content"
+  ]
+}
+```
+
+Source: [`packages/hxa/tool-hxa/src/index.ts`](../packages/hxa/tool-hxa/src/index.ts)
+
+The team tools register together while the hub endpoint is configured and the bot token variable is set; a dormant hub advertises nothing. hxa_inbox expansion is bounded by the plugin config.
 
 <a id="deepseek-aidsh-tool-todo"></a>
 

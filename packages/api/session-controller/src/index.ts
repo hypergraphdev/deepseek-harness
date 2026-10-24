@@ -20,7 +20,7 @@ import {
   ApiSessionAgentController,
   type ApiSessionAgentResult,
 } from './agent.ts'
-import { SessionCommandController, hasPromptContent } from './commands.ts'
+import { SessionCommandController, hasPromptContent, isAdmissibleBrowserPage } from './commands.ts'
 import { SessionControlController } from './control.ts'
 import { SessionHistoryController } from './history.ts'
 import { SessionFileReferences } from './file-references.ts'
@@ -464,6 +464,13 @@ export class SessionController extends TypertRemoteService {
         { value: request.clientTimeZone },
       )
     }
+    if (request.browserPage !== undefined && !isAdmissibleBrowserPage(request.browserPage)) {
+      throw new RemoteError(
+        'gateway/bad-request',
+        'browserPage must carry a bounded http(s) or file url and a bounded title',
+        {},
+      )
+    }
     // The caller is recorded only when it is not the owner, so owner messages keep their exact source.
     const principal = principalOf(this.ctx.invocation)
     const source: MessageSource = {
@@ -471,6 +478,7 @@ export class SessionController extends TypertRemoteService {
       rpcId: request.requestId,
       ...(clientTimeZone === undefined ? {} : { clientTimeZone }),
       ...(principal === undefined ? {} : { principal }),
+      ...(request.browserPage === undefined ? {} : { browserPage: request.browserPage }),
     }
     return this.commands.prompt(request, source)
   }

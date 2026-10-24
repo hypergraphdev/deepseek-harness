@@ -1,6 +1,8 @@
 /** Session commands whose activation policy is explicit at each Remote method. */
 
 import { modelAvailable } from './catalog.ts'
+import { BROWSER_PAGE_TITLE_MAX_CHARS, BROWSER_PAGE_URL_MAX_CHARS } from './types.ts'
+import type { PromptBrowserPage } from './types.ts'
 import { randomUUID } from 'node:crypto'
 import type { Context } from '@deepseek-ai/cordis'
 import { brandString } from '@deepseek-ai/dsh-brand'
@@ -654,4 +656,19 @@ function referencedImage(
     if (found !== undefined) return found
   }
   return undefined
+}
+
+/**
+ * Validate one extension-reported active page at the wire boundary.
+ * @param value - the reported page, or `null` for the valid "no active page" report.
+ * @returns whether the report is admissible.
+ */
+export function isAdmissibleBrowserPage(value: PromptBrowserPage | null): boolean {
+  if (value === null) return true
+  return typeof value === 'object'
+    && typeof value.url === 'string'
+    && /^(?:https?|file):\/\//.test(value.url)
+    && value.url.length <= BROWSER_PAGE_URL_MAX_CHARS
+    && typeof value.title === 'string'
+    && value.title.length <= BROWSER_PAGE_TITLE_MAX_CHARS
 }

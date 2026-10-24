@@ -68,6 +68,7 @@ Every package below exports a Cordis plugin that a bundle patch can name in a Lo
 | `@deepseek-ai/dsh-client-resources` | no | Unified client resource model: protocol-registered providers turn URL addresses into live values, consumed through the useResource global standard hook |
 | `@deepseek-ai/dsh-client-shortcuts` | yes | Application keyboard command registry and physical-key routing |
 | `@deepseek-ai/dsh-client-ui-agent-preset` | no | Agent-preset surfaces: the default for later sessions, this session's seat, and the composition editor |
+| `@deepseek-ai/dsh-client-ui-agents` | no | The sidebar HXA team panel: a read-only roster of the user's org bots with presence dots, hidden while HXA is dormant |
 | `@deepseek-ai/dsh-client-ui-approval` | no | Approval composer takeover over the scoped Remote Event waterfall |
 | `@deepseek-ai/dsh-client-ui-attachment` | no | Dynamic attachment presentation plugin for conversation input, message-image, and trajectory image slots |
 | `@deepseek-ai/dsh-client-ui-brand-official` | no | Official DeepSeek Harness brand occupants for the Web client's sidebar slots |
@@ -107,6 +108,7 @@ Every package below exports a Cordis plugin that a bundle patch can name in a Lo
 | `@deepseek-ai/dsh-client-ui-settings-shell` | no | Settings page of the shell executor on the dsh web client's Plugins page: the command timeout and the per-stream output cap of the shell namespace |
 | `@deepseek-ai/dsh-client-ui-settings-subagent` | no | Settings page of Subagent delegation on the dsh web client's Plugins page: recursion depth, parallel capacity, and the models agents may choose for subagents |
 | `@deepseek-ai/dsh-client-ui-settings-web-search` | no | Settings page of the DeepSeek web-search provider on the dsh web client's Plugins page: its API key, endpoint, and per-request search budget |
+| `@deepseek-ai/dsh-client-ui-settings-weixin` | no | The WeChat settings section: link an account by scanning a QR, shown only while the host exposes the WeChat capability |
 | `@deepseek-ai/dsh-client-ui-shortcuts` | no | Keyboard shortcut reference, recording, and local preference editing |
 | `@deepseek-ai/dsh-client-ui-sidebar` | no | Sidebar plugin: session multi-level tree, search, grouping, state dots |
 | `@deepseek-ai/dsh-client-ui-sidebar-browser` | no | Sandboxed Web browser tabs for the right Sidebar |
@@ -286,6 +288,14 @@ Every package below exports a Cordis plugin that a bundle patch can name in a Lo
 | `@deepseek-ai/dsh-host-plugin-inventory` | no | Read-only Remote projection of current Cordis Loader plugin state |
 | `@deepseek-ai/dsh-host-product-telemetry-otel` | yes | Explicit product usage events exported through OpenTelemetry HTTP logs |
 | `@deepseek-ai/dsh-host-webserver` | yes | Web route-registration plugin: HTTP and upgrade routes, per-Peer index transform taps, and static dist fallback |
+
+## hxa
+
+| Package | Config | Description |
+|---|---|---|
+| `@deepseek-ai/dsh-hxa` | yes | HXA Connect capability (ctx.hxa): one org-scoped bot connection to a self-hosted hub — peers, direct messages, offline catchup — dormant until url and token resolve |
+| `@deepseek-ai/dsh-hxa-inbound` | yes | HXA inbound bridge: one hub WebSocket keeps the harness bot online and wakes a coordinator agent per inbound direct message; the agent replies through its own hxa_send |
+| `@deepseek-ai/dsh-tool-hxa` | yes | Model-facing HXA tools (hxa_contacts, hxa_send, hxa_inbox): the agent's membership in its human's HXA Connect org, registered only while ctx.hxa resolves a live endpoint |
 
 ## interaction
 
@@ -514,6 +524,13 @@ Every package below exports a Cordis plugin that a bundle patch can name in a Lo
 | `@deepseek-ai/dsh-web-search-deepseek` | yes | DeepSeek-backed search provider (native web_search via the Anthropic-compatible API) for the DeepSeek Harness web capability seam (ctx.web) |
 | `@deepseek-ai/dsh-web-search-exa` | yes | Exa-backed search provider for the DeepSeek Harness web capability seam (ctx.web) |
 | `@deepseek-ai/dsh-web-search-perplexity` | yes | Perplexity-backed search provider for the DeepSeek Harness web capability seam (ctx.web) |
+
+## weixin
+
+| Package | Config | Description |
+|---|---|---|
+| `@deepseek-ai/dsh-weixin` | yes | WeChat capability (ctx.weixin): one QR-linked WeChat account — QR login, durable credential, long-poll receive, text send — dormant until an account is linked |
+| `@deepseek-ai/dsh-weixin-agent` | yes | WeChat agent bridge: an inbound WeChat message wakes a dedicated agent, and the assistant text closing that turn is sent back to the sender |
 
 ## workflow
 

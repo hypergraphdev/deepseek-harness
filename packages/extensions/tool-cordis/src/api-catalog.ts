@@ -1465,6 +1465,62 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
     ],
   },
   {
+    key: 'hxa',
+    summary: 'The HXA Connect connection service.',
+    description: 'The HXA Connect connection service. One instance serves one bot identity on one hub; agents and UI reach the org through its methods only.',
+    methods: [
+      {
+        signature: 'endpoint(): HxaEndpoint | undefined',
+        description: 'Resolve the live endpoint, or undefined while dormant.',
+        parameters: [],
+        returns: 'the hub URL and token, or undefined when either is missing.',
+      },
+      {
+        signature: 'async listBots(query?: string, signal?: AbortSignal): Promise<HxaBot[]>',
+        description: 'List org peers.',
+        parameters: [{ name: 'query', description: 'optional fuzzy filter over bio/role/function.' }, { name: 'signal', description: 'caller cancellation.' }],
+        returns: 'the org\'s bots.',
+      },
+      {
+        signature: 'async send(to: string, content: string, signal?: AbortSignal): Promise<HxaSendReceipt>',
+        description: 'Send one direct message; the hub creates or reuses the DM channel.',
+        parameters: [{ name: 'to', description: 'target bot name or id.' }, { name: 'content', description: 'message body.' }, { name: 'signal', description: 'caller cancellation.' }],
+        returns: 'the channel and committed message.',
+      },
+      {
+        signature: 'async catchupCount(since: number, signal?: AbortSignal): Promise<HxaCatchupCount>',
+        description: 'Count events missed since a timestamp.',
+        parameters: [{ name: 'since', description: 'epoch milliseconds.' }, { name: 'signal', description: 'caller cancellation.' }],
+        returns: 'per-kind unread counts.',
+      },
+      {
+        signature: 'async catchup(since: number, cursor?: string, signal?: AbortSignal): Promise<HxaCatchupPage>',
+        description: 'Fetch one page of missed-event summaries.',
+        parameters: [{ name: 'since', description: 'epoch milliseconds.' }, { name: 'cursor', description: 'pagination cursor from the previous page.' }, { name: 'signal', description: 'caller cancellation.' }],
+        returns: 'the page; unknown event kinds are dropped.',
+      },
+      {
+        signature: 'async channelMessages(channelId: string, limit: number, signal?: AbortSignal): Promise<HxaMessage[]>',
+        description: 'Read recent messages of one channel, oldest first.',
+        parameters: [{ name: 'channelId', description: 'the channel to read.' }, { name: 'limit', description: 'maximum messages to return.' }, { name: 'signal', description: 'caller cancellation.' }],
+        returns: 'the channel\'s most recent messages.',
+      },
+      {
+        signature: 'async wsTicket(signal?: AbortSignal): Promise<string>',
+        description: 'Exchange the bot token for a one-time WebSocket connection ticket. The ticket is single-use and short-lived; fetch one immediately before each connect.',
+        parameters: [{ name: 'signal', description: 'caller cancellation.' }],
+        returns: 'the connection ticket.',
+      },
+      {
+        signature: 'wsUrl(ticket: string): string',
+        description: 'Build the WebSocket URL for a ticket, deriving the ws(s) scheme and `/ws` path from the configured hub URL.',
+        parameters: [{ name: 'ticket', description: 'a ticket from {@link wsTicket}.' }],
+        returns: 'the full `wss://…/ws?ticket=…` URL.',
+        throws: ['HxaError when the service is dormant.'],
+      },
+    ],
+  },
+  {
     key: 'inspector',
     summary: 'Shared Host/Client service façade over the realm\'s source publisher.',
     description: 'Shared Host/Client service façade over the realm\'s source publisher.',
@@ -3959,6 +4015,42 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
     ],
   },
   {
+    key: 'weixin',
+    summary: 'The WeChat connection.',
+    description: 'The WeChat connection. One linked account per harness home; linking, receiving, and sending all run through this service.',
+    methods: [
+      {
+        signature: 'status(): WeixinStatus',
+        description: 'The panel\'s view of the connection.',
+        parameters: [],
+        returns: 'whether an account is linked, plus any pending challenge.',
+      },
+      {
+        signature: 'async startLink(): Promise<string>',
+        description: 'Begin linking: fetch a QR and poll it until the user confirms in WeChat. Calling it while a challenge is pending returns that one.',
+        parameters: [],
+        returns: 'the payload to render as a QR image.',
+        throws: ['WeixinError when the API refuses a challenge.'],
+      },
+      {
+        signature: 'unlink(): void',
+        description: 'Drop the stored credential and stop receiving.',
+        parameters: [],
+      },
+      {
+        signature: 'async send(toUserId: string, text: string, contextToken?: string): Promise<void>',
+        description: 'Send one text message to a WeChat user.',
+        parameters: [{ name: 'toUserId', description: 'the recipient, normally an inbound message\'s sender.' }, { name: 'text', description: 'the reply body.' }, { name: 'contextToken', description: 'the conversation token from that user\'s message.' }],
+        throws: ['WeixinError when no account is linked.'],
+      },
+      {
+        signature: 'async setTyping(toUserId: string, typing: boolean): Promise<void>',
+        description: 'Show or clear the typing indicator in one chat. Failures are swallowed: the indicator is a courtesy, and losing it must never cost the reply.',
+        parameters: [{ name: 'toUserId', description: 'the chat to indicate in.' }, { name: 'typing', description: 'true while composing, false to clear.' }],
+      },
+    ],
+  },
+  {
     key: 'workflowEngine',
     summary: 'Workflow Service Definition contract.',
     description: 'Workflow Service Definition contract. Invalid requests throw before publication; a live run is holder-owned, its result never rejects, and disposal waits for script and child cleanup. Lifecycle listener failures are contained, and `workflow/end` fires exactly once as the result settles.',
@@ -4823,6 +4915,22 @@ export const EVENT_API: readonly EventApiEntry[] = [
     summary: 'Collect the structured index injection table for the page `peer` speaks for.',
     description: 'Collect the structured index injection table for the page `peer` speaks for. Emitted on every index render and every worker boot-payload request; listeners push their current rows, so a row\'s data is read fresh at emit time.',
     parameters: [{ name: 'table', description: 'Mutable row table; listeners append in activation order.' }, { name: 'peer', description: 'The Peer the rendered page speaks for.' }],
+  },
+  {
+    name: 'weixin/link',
+    mode: 'emit',
+    signature: '\'weixin/link\'(linked: boolean): void',
+    summary: 'The link state changed: a scan completed, or the credential was dropped or rejected.',
+    description: 'The link state changed: a scan completed, or the credential was dropped or rejected.',
+    parameters: [{ name: 'linked', description: 'whether an account is now linked.' }],
+  },
+  {
+    name: 'weixin/message',
+    mode: 'emit',
+    signature: '\'weixin/message\'(message: InboundText): void',
+    summary: 'One inbound WeChat message, after the receive loop accepted it.',
+    description: 'One inbound WeChat message, after the receive loop accepted it.',
+    parameters: [{ name: 'message', description: 'the sender, text, and conversation token.' }],
   },
   {
     name: 'workflow/agent-end',
@@ -5957,6 +6065,34 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export interface HostConnectionRpc {\n    handle(channel: string, handler: ConnectionRpcHandler): () => Promise<void>;\n    intercept(channel: \'/api\', matches: ConnectionRpcEndpointMatcher, handler: ConnectionRpcHandler): () => Promise<void>;\n}',
   },
   {
+    name: 'HxaBot',
+    declaration: 'export interface HxaBot {\n    name: string;\n    bio?: string;\n    role?: string;\n    online: boolean;\n    statusText?: string;\n}',
+  },
+  {
+    name: 'HxaCatchupCount',
+    declaration: 'export interface HxaCatchupCount {\n    threadInvites: number;\n    threadStatusChanges: number;\n    threadActivities: number;\n    channelMessages: number;\n    total: number;\n}',
+  },
+  {
+    name: 'HxaCatchupEvent',
+    declaration: 'export type HxaCatchupEvent = {\n    type: \'channel_message_summary\';\n    channelId: string;\n    channelName?: string;\n    count: number;\n    lastAt: number;\n} | {\n    type: \'thread_invited\';\n    threadId: string;\n    topic: string;\n    inviter: string;\n} | {\n    type: \'thread_status_changed\';\n    threadId: string;\n    topic: string;\n    from: string;\n    to: string;\n    by: string;\n};',
+  },
+  {
+    name: 'HxaCatchupPage',
+    declaration: 'export interface HxaCatchupPage {\n    events: HxaCatchupEvent[];\n    hasMore: boolean;\n    cursor?: string;\n}',
+  },
+  {
+    name: 'HxaEndpoint',
+    declaration: 'export interface HxaEndpoint {\n    url: string;\n    token: string;\n}',
+  },
+  {
+    name: 'HxaMessage',
+    declaration: 'export interface HxaMessage {\n    id: string;\n    senderName: string;\n    content: string;\n    createdAt: number;\n}',
+  },
+  {
+    name: 'HxaSendReceipt',
+    declaration: 'export interface HxaSendReceipt {\n    channelId: string;\n    message: HxaMessage;\n}',
+  },
+  {
     name: 'ImageAttachmentLimits',
     declaration: 'export interface ImageAttachmentLimits {\n    maxImageBytes: number;\n    maxImagesPerMessage: number;\n    maxMessageImageBytes: number;\n    maxImagePixels: number;\n    maxImageDimension: number;\n    mediaTypes: readonly ImageMediaType[];\n}',
   },
@@ -5983,6 +6119,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'ImageVariantId',
     declaration: 'export type ImageVariantId = Branded<\'ImageVariantId\'>;',
+  },
+  {
+    name: 'InboundText',
+    declaration: 'export interface InboundText {\n    fromUserId: string;\n    text: string;\n    createdAt: number;\n    contextToken?: string;\n}',
   },
   {
     name: 'IncompatiblePlugin',
@@ -6901,6 +7041,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export interface PromptAssembly extends PromptPresentation {\n    tools: ToolSchema[];\n}',
   },
   {
+    name: 'PromptBrowserPage',
+    declaration: 'export interface PromptBrowserPage {\n    readonly url: string;\n    readonly title: string;\n}',
+  },
+  {
     name: 'PromptContext',
     declaration: 'export interface PromptContext {\n    readonly name: string;\n    readonly order: number;\n    readonly text: string | ((context: AssembleContext) => string);\n    readonly interpolate?: boolean;\n    readonly required?: boolean;\n}',
   },
@@ -7746,7 +7890,7 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   },
   {
     name: 'SessionPromptRequest',
-    declaration: 'export interface SessionPromptRequest {\n    readonly requestId: SessionRequestId;\n    readonly sessionId: SessionId;\n    readonly mode: \'queue\' | \'steer\';\n    readonly content: readonly PromptContentPart[];\n    readonly clientTimeZone?: string;\n}',
+    declaration: 'export interface SessionPromptRequest {\n    readonly requestId: SessionRequestId;\n    readonly sessionId: SessionId;\n    readonly mode: \'queue\' | \'steer\';\n    readonly content: readonly PromptContentPart[];\n    readonly clientTimeZone?: string;\n    readonly browserPage?: PromptBrowserPage | null;\n}',
   },
   {
     name: 'SessionPromptValue',
@@ -9099,6 +9243,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'WeeklyScheduleRecord',
     declaration: 'export interface WeeklyScheduleRecord {\n    readonly id: ScheduleId;\n    readonly kind: \'weekly\';\n    readonly title: string;\n    readonly prompt: string;\n    readonly time: string;\n    readonly timeZone: string;\n    readonly weekdays: number[];\n    readonly scheduledAt: string;\n}',
+  },
+  {
+    name: 'WeixinStatus',
+    declaration: 'export interface WeixinStatus {\n    linked: boolean;\n    accountId?: string;\n    qrcodeUrl?: string;\n    scanned?: boolean;\n}',
   },
   {
     name: 'WorkflowAgentEndInfo',

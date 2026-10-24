@@ -401,6 +401,9 @@ export function SidebarRoot({
         <Toast key={copiedToast} tone="success" text={t('version.copied')} onDone={() => { setCopiedToast(null) }} />
       )}
 
+      {/* The roster seat's registrant renders nothing while its source is dormant. */}
+      {renderSlot('sidebar.agents', { wide })}
+
       {/* Footer actions stack above Settings in both sidebar widths. */}
       <div className={css.footArea}>
         <div className={css.footerActions}>

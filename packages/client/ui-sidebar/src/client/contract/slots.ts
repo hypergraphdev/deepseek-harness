@@ -54,6 +54,12 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
      * package's 'sidebar' entry; each action receives only the column state.
      */
     'sidebar.footer.action': { kind: 'list'; scope: 'root'; owner: SidebarFooterActionOwnerProps }
+    /**
+     * The team roster seat between the browsing region and the foot.
+     * Declared by this package's 'sidebar' entry; ui-agents registers the
+     * HXA roster panel, which renders nothing while its source is dormant.
+     */
+    'sidebar.agents': { kind: 'single'; scope: 'root'; owner: SidebarFooterActionOwnerProps }
   }
 }
 
@@ -192,6 +198,7 @@ export type SidebarRootComponentProps =
     | 'sidebar.panellist'
     | 'sidebar.panellist.actions'
     | 'sidebar.workspaces'
+    | 'sidebar.agents'
     | 'sidebar.settings'
     | 'sidebar.footer.action'
   >

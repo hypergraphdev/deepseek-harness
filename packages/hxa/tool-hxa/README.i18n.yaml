@@ -1,0 +1,58 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/hxa/tool-hxa/README.md
+/:
+  en: 00def4be1f9713a8
+  zh: a2c06ac5809984ee
+/deepseek-ai-dsh-tool-hxa:
+  en: 4d645e819909b9f3
+  zh: 940552000eb602e3
+/deepseek-ai-dsh-tool-hxa/summary:
+  en: 6c6aa52f63094cca
+  zh: ec5a3c7aa799d75e
+/deepseek-ai-dsh-tool-hxa/table-of-contents:
+  en: 3a654e12f423946b
+  zh: 56d8e3fc4c1b5baa
+/deepseek-ai-dsh-tool-hxa/use-this-package:
+  en: 720e48de7f98275c
+  zh: fc5970b97795ad48
+/deepseek-ai-dsh-tool-hxa/configuration:
+  en: fa36f323c6375a68
+  zh: 3422b47e4459df97
+/deepseek-ai-dsh-tool-hxa/model-experience:
+  en: 215e7ba838619b7b
+  zh: 215e7ba838619b7b
+/deepseek-ai-dsh-tool-hxa/model-experience/org-prompt-section:
+  en: ca09502917b3ad77
+  zh: 20b23e48423ad155
+/deepseek-ai-dsh-tool-hxa/model-experience/org-prompt-section/what-the-model-sees:
+  en: 2d30d1167d352bd7
+  zh: 5c0c8916bc71eac9
+/deepseek-ai-dsh-tool-hxa/model-experience/org-prompt-section/what-the-model-sees/section-text:
+  en: 0f7724bcd908c288
+  zh: 0f7724bcd908c288
+/deepseek-ai-dsh-tool-hxa/model-experience/org-prompt-section/token-effect:
+  en: 3fc63c2ea1388dbc
+  zh: bed9ee71a26709e4
+/deepseek-ai-dsh-tool-hxa/model-experience/org-prompt-section/kv-cache-effect:
+  en: ee9e52f769d0d124
+  zh: c6ec5853f0307a31
+/deepseek-ai-dsh-tool-hxa/model-experience/tool-schemas-and-results:
+  en: cadc497841430a21
+  zh: af4cc374d7d16917
+/deepseek-ai-dsh-tool-hxa/model-experience/tool-schemas-and-results/what-the-model-sees:
+  en: c59ee2b937195ca5
+  zh: b4229829fa7e8f55
+/deepseek-ai-dsh-tool-hxa/model-experience/tool-schemas-and-results/token-effect:
+  en: 5611b2450886218c
+  zh: 699284d37490a650
+/deepseek-ai-dsh-tool-hxa/model-experience/tool-schemas-and-results/kv-cache-effect:
+  en: 4612e8e6673f8dd2
+  zh: 281a9922d7767543
+/deepseek-ai-dsh-tool-hxa/known-limitations-and-deferred-work:
+  en: ea93aa04134ace58
+  zh: 1c4e5e19722a3fee
+/deepseek-ai-dsh-tool-hxa/known-limitations-and-deferred-work/dev-note:
+  en: 550ed115d6a4b128
+  zh: 81fe203f76e710f9

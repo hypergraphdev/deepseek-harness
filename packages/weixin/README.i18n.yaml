@@ -1,0 +1,25 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/weixin/README.md
+/:
+  en: 9ea3faafed7585e6
+  zh: d852955fa9b52534
+/weixin:
+  en: 6d8a43e382c5a81d
+  zh: 9db3ce1d88be4baa
+/weixin/summary:
+  en: 3a0f6f10714dbe25
+  zh: 20d02e188271ad78
+/weixin/table-of-contents:
+  en: 1eb35b015a6c423f
+  zh: a8a3dceee2c9e943
+/weixin/packages:
+  en: d09ea29f7c8dd5da
+  zh: 5bbbbe09c587044c
+/weixin/related-documentation:
+  en: 945a80768db94773
+  zh: 66eba16ad0b0ddc6
+/weixin/dev-note:
+  en: 5de1d6304e00c58f
+  zh: 8d8225361cfa29e5

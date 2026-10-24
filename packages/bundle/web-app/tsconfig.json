@@ -36,6 +36,21 @@
       "path": "../../util/launch-environment"
     },
     {
+      "path": "../../core/agent"
+    },
+    {
+      "path": "../../llm/llm"
+    },
+    {
+      "path": "../../api/session-controller/tsconfig.host.json"
+    },
+    {
+      "path": "../../hxa/hxa"
+    },
+    {
+      "path": "../../weixin/weixin"
+    },
+    {
       "path": "../../shell/shell-env"
     },
     {

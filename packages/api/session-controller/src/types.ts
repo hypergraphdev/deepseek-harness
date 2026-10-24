@@ -311,6 +311,24 @@ export interface SessionForkValue {
   readonly sessionId: SessionId
 }
 
+/**
+ * The active browser tab a panel-embedded client attached to one prompt.
+ * `null` in its carrying slots means the panel is attached but the active tab
+ * is not a web or file page, superseding any earlier page.
+ */
+export interface PromptBrowserPage {
+  /** The tab's http(s) or file URL, at most {@link BROWSER_PAGE_URL_MAX_CHARS} characters. */
+  readonly url: string
+  /** The tab's title, possibly empty, at most {@link BROWSER_PAGE_TITLE_MAX_CHARS} characters. */
+  readonly title: string
+}
+
+/** Host admission cap on {@link PromptBrowserPage.url}. */
+export const BROWSER_PAGE_URL_MAX_CHARS = 2048
+
+/** Host admission cap on {@link PromptBrowserPage.title}. */
+export const BROWSER_PAGE_TITLE_MAX_CHARS = 256
+
 /** Session prompt request. */
 export interface SessionPromptRequest {
   /** Client-minted identity persisted on the exact accepted user message. */
@@ -320,6 +338,8 @@ export interface SessionPromptRequest {
   /** At least one non-whitespace text part or attachment. */
   readonly content: readonly PromptContentPart[]
   readonly clientTimeZone?: string
+  /** Active tab reported by the browser extension panel; `null` reports no web or file page. */
+  readonly browserPage?: PromptBrowserPage | null
 }
 
 /** Receipt after one prompt enters the target Agent inbox. */
@@ -386,7 +406,13 @@ declare module '@deepseek-ai/dsh-llm' {
      * caller that submitted the prompt. `principal` is written only for a
      * caller other than the owner, so an absent `principal` means the owner.
      */
-    'user-rpc': { kind: 'user'; rpcId: SessionRequestId; clientTimeZone?: string; principal?: Principal }
+    'user-rpc': {
+      kind: 'user'
+      rpcId: SessionRequestId
+      clientTimeZone?: string
+      principal?: Principal
+      browserPage?: PromptBrowserPage | null
+    }
   }
 }
 

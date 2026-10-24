@@ -1,0 +1,31 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/client/ui-settings-weixin/README.md
+/:
+  en: b013bbf6065b225d
+  zh: 33b3e161a80a5971
+/deepseek-ai-dsh-client-ui-settings-weixin:
+  en: 2985d6910b7d98b3
+  zh: 3ce80708ecd42794
+/deepseek-ai-dsh-client-ui-settings-weixin/summary:
+  en: 32c1fa609acfc6a7
+  zh: 147b6a79c3f278e8
+/deepseek-ai-dsh-client-ui-settings-weixin/table-of-contents:
+  en: 4e53164159b5ce41
+  zh: 814c08f45f3efcd6
+/deepseek-ai-dsh-client-ui-settings-weixin/use-this-package:
+  en: fd452cb8540e12dc
+  zh: 8a55e33f6f67e341
+/deepseek-ai-dsh-client-ui-settings-weixin/model-experience:
+  en: 1e6781f3d8d80a30
+  zh: 7f9c6a15522630bc
+/deepseek-ai-dsh-client-ui-settings-weixin/model-experience/kv-cache-effect:
+  en: 7ab97b84a99d9571
+  zh: 0df0d8d996880cb5
+/deepseek-ai-dsh-client-ui-settings-weixin/known-limitations-and-deferred-work:
+  en: 77a80b9efd13619b
+  zh: d32ebf7ea71776ab
+/deepseek-ai-dsh-client-ui-settings-weixin/known-limitations-and-deferred-work/dev-note:
+  en: 4a35c2bbcc8a8078
+  zh: d80fce43c4a08203

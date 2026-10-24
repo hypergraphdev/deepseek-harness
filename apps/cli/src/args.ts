@@ -57,8 +57,28 @@ interface PluginInvocation {
   args: string[]
 }
 
+/** Serve the browser extension's native-messaging endpoint over stdio. */
+interface BrowserHostInvocation {
+  mode: 'browser-host'
+  /** Port the dsh web server is expected on; the host launches one there when absent. */
+  port: number
+}
+
+/** Write the native-messaging host manifest and shim so a browser can launch dsh. */
+interface InstallBrowserHostInvocation {
+  mode: 'install-browser-host'
+  /** The browser extension id allowed to connect to the native host. */
+  extension: string
+  /** Target browsers whose manifest directories receive the registration. */
+  browsers: string[]
+  /** Port recorded in the shim for the launched dsh web server. */
+  port: number
+}
+
 /** The resolved `dsh` invocation. Help, version, and errors exit inside {@link parseDshArgs}. */
-export type DshInvocation = ProfileInvocation | DumpConfigInvocation | DumpConfigSchemaInvocation | PluginInvocation
+export type DshInvocation
+  = ProfileInvocation | DumpConfigInvocation | DumpConfigSchemaInvocation | PluginInvocation
+    | BrowserHostInvocation | InstallBrowserHostInvocation
 
 /** Launcher flags for profile boot and configuration dumps. */
 interface BootOptions {
@@ -80,6 +100,26 @@ function selectProfile(value: string, previous?: string): string {
   return value
 }
 
+/**
+ * Command names that address the launcher itself, so a bare first token naming
+ * one must not expand into `--profile <name>`.
+ */
+const SUBCOMMANDS = new Set(['plugin', 'browser-host', 'install-browser-host'])
+
+/**
+ * Resolve a `--port` option value.
+ * @param program - the command whose error exit reports a rejected value.
+ * @param value - the raw option text.
+ * @returns the validated port number.
+ */
+function parsePort(program: Command, value: string): number {
+  const port = Number(value)
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    program.error('error: --port needs an integer between 1 and 65535')
+  }
+  return port
+}
+
 function rejectElectronProfile(program: Command, profile: string): void {
   if (profile.toLowerCase() === 'desktop') {
     program.error('error: profile "desktop" is managed exclusively by the Electron application')
@@ -97,6 +137,7 @@ Examples:
   dsh tui --resume <session>                arguments after the launcher flags reach the app
   dsh web --help                            the web app's own flags and help
   dsh plugin --profile tui add <package>    install a plugin into the tui profile
+  dsh install-browser-host --extension <id>  let the browser extension launch dsh web
 `
 
 /**
@@ -202,8 +243,41 @@ export function parseDshArgs(argv: readonly string[], version: string, manageDes
       })
   }
 
+  if (first === 'browser-host') {
+    program.command('browser-host')
+      .description('serve the browser extension\'s native-messaging endpoint over stdio (the browser launches this; not for interactive use)')
+      // The browser appends its own arguments (the caller origin, and
+      // --parent-window on Windows); the host ignores them.
+      .allowUnknownOption()
+      .argument('[args...]', 'browser-supplied arguments, ignored')
+      .option('--port <port>', 'port the dsh web server serves on', '3080')
+      .action((_args: string[], options: { port: string }) => {
+        resolved = { mode: 'browser-host', port: parsePort(program, options.port) }
+      })
+  }
+
+  if (first === 'install-browser-host') {
+    program.command('install-browser-host')
+      .description('register the native-messaging host manifest and shim so the browser extension can launch dsh web')
+      .helpOption('-h, --help', 'show this help')
+      .requiredOption('--extension <id>', 'the browser extension id allowed to connect')
+      .option('--browser <name>', 'target browser: chrome | edge (repeatable)', collect)
+      .option('--port <port>', 'port the launched dsh web server serves on', '3080')
+      .action((options: { extension: string; browser?: string[]; port: string }) => {
+        if (options.extension === '') program.error('error: --extension needs an id')
+        const browsers = options.browser ?? ['chrome']
+        if (browsers.includes('')) program.error('error: --browser needs a name')
+        resolved = {
+          mode: 'install-browser-host',
+          extension: options.extension,
+          browsers,
+          port: parsePort(program, options.port),
+        }
+      })
+  }
+
   try {
-    const expanded = first !== undefined && !first.startsWith('-') && first !== 'plugin'
+    const expanded = first !== undefined && !first.startsWith('-') && !SUBCOMMANDS.has(first)
       ? ['--profile', ...argv]
       : argv
     program.parse(expanded, { from: 'user' })

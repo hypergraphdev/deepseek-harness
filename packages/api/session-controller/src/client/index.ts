@@ -7,6 +7,7 @@ import type {} from '@deepseek-ai/dsh-client-file-upload/client'
 import { typertOwnedValue } from '@deepseek-ai/dsh-typert-protocol'
 import { createSessionControlStream } from './transport.ts'
 import { ClientSessions } from './sessions/service.ts'
+import { installBrowserPageListener } from './browser-page.ts'
 import type { SessionRemotes } from './sessions/remotes.ts'
 import type {} from '../remote-events.ts'
 
@@ -146,4 +147,5 @@ export function apply(ctx: Context): void {
     },
   })
   ctx.effect(() => async () => { await control.dispose() }, 'session-controller.client.control')
+  ctx.effect(() => installBrowserPageListener(), 'session-controller.client.browser-page')
 }
